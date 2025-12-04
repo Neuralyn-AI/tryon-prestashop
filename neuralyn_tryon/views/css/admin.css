@@ -1,0 +1,11 @@
+.neuralyn-connect-page,
+.neuralyn-callback,
+.panel .btn {
+    margin-top: 10px;
+}
+
+.neuralyn-callback h1,
+.neuralyn-connect-page h1 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
