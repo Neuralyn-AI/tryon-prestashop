@@ -50,15 +50,40 @@ The module operates as a bridge between your PrestaShop store and the Neuralyn c
 
 ### Widget Integration
 
-The module hooks into multiple PrestaShop display points to inject the try-on widget:
+The module hooks into multiple PrestaShop display points to inject the try-on widget and button:
 
-| Hook | Purpose |
-|------|---------|
-| `displayHeader` | Primary injection point in page header |
-| `displayTop` | Top of page display |
-| `displayFooter` | Footer display |
+| Hook | Description | Location Options |
+|------|-------------|------------------|
+| `displayHeader` | Widget script injection (always enabled) | - |
+| `displayProductPriceBlock_after_price` | After product price | Product page / Listings / Both |
+| `displayProductPriceBlock_before_price` | Before product price | Product page / Listings / Both |
+| `displayProductPriceBlock_weight` | Near product weight | Product page / Listings / Both |
+| `displayAfterProductThumbs` | After product thumbnails | Product page only |
+| `displayReassurance` | In reassurance block | Product page only |
+| `displayProductAdditionalInfo` | Additional product info area | Product page only |
+| `displayProductExtraContent` | Extra content tabs | Product page only |
 
 The widget is loaded asynchronously from `https://cdn.neuralyn.com/widget.js` to ensure it doesn't affect page load performance.
+
+### Hook Configuration
+
+In the module configuration, you can:
+
+- **Enable/Disable hooks**: Control which hooks display the TRYON button
+- **Set location**: For price block hooks, choose where to display (product page only, listings only, or both)
+- **Set button size**: Choose button size per hook (Default, Small, or Tiny)
+
+### Button Design
+
+Customize the TRYON button appearance:
+
+- **Enable Color Customization**: Toggle to enable custom colors
+  - When enabled: Set background and text colors via color pickers
+  - When disabled: Style the button manually via CSS using the `.neuralyn-tryon-app-button` class
+- **Button Sizes**: Three sizes available (default, small, tiny) with CSS classes:
+  - `.neuralyn-tryon-app-button` (default)
+  - `.neuralyn-tryon-app-button.size-small`
+  - `.neuralyn-tryon-app-button.size-tiny`
 
 ### API Access
 
@@ -69,6 +94,10 @@ The module creates read-only API access with the following permissions:
 | Products | Read (GET) | Retrieve product information for try-on |
 | Customers | Read (GET) | Customer context for personalization |
 | Orders | Read (GET) | Order data for analytics |
+| Images | Read (GET) | Access product images |
+| Image Types | Read (GET) | Retrieve image format configurations |
+| Languages | Read (GET) | Multi-language support |
+| Search | Read (GET) | Product search capabilities |
 
 The module uses WebService key authentication for all PrestaShop versions (1.6, 1.7, and 8.0+).
 
@@ -80,6 +109,8 @@ The module uses WebService key authentication for all PrestaShop versions (1.6, 
 - **Multi-Shop Ready**: Supports PrestaShop's multi-shop feature
 - **Clean Uninstallation**: Removes all traces when uninstalled
 - **Non-Blocking Widget**: Asynchronous loading ensures no impact on page performance
+- **Configurable Hooks**: Enable/disable button display per hook with location options
+- **Customizable Button**: Three button sizes with optional color customization
 
 ## Connection Flow
 
@@ -159,14 +190,15 @@ neuralyn_tryon/
 ├── neuralyn_tryon.php           # Main module class
 ├── config.xml                    # Module metadata
 ├── license.txt                   # License agreement
-├── logo.png                      # Module icon
+├── logo.png                      # Module icon (32x32)
 ├── controllers/
 │   └── front/
 │       ├── connect.php          # Frontend connection endpoint
 │       └── callback.php         # API callback handler
 ├── views/
 │   ├── css/
-│   │   └── admin.css            # Admin panel styling
+│   │   ├── admin.css            # Admin panel styling
+│   │   └── front.css            # Frontend button styling
 │   └── templates/
 │       ├── admin/
 │       │   └── configure.tpl    # Configuration page template
@@ -174,7 +206,8 @@ neuralyn_tryon/
 │       │   ├── connect.tpl      # Connection page template
 │       │   └── callback.tpl     # Callback page template
 │       └── hook/
-│           └── header.tpl       # Widget injection template
+│           ├── header.tpl       # Widget injection template
+│           └── button.tpl       # TRYON button template
 └── upgrade/
     └── upgrade-1.0.1.php        # Version upgrade script
 ```
