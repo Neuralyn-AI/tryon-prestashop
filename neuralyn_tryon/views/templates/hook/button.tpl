@@ -17,8 +17,8 @@
  * @copyright © 2025 Neuralyn
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  *}
-<div class="neuralyn-tryon-hook-test" style="margin: 5px 0;">
-    <button type="button" style="background-color: #000000; color: #ffffff; padding: 10px 20px; border: none; cursor: pointer; font-size: 14px; font-family: monospace;">
-        {$neuralyn_hook_name|escape:'html':'UTF-8'}
+<div class="neuralyn-tryon-hook-container">
+    <button type="button" class="neuralyn-tryon-app-button {if $neuralyn_button_size != 'default'}size-{$neuralyn_button_size|escape:'html':'UTF-8'}{/if}"{if $neuralyn_btn_colors_enabled} style="background-color: {$neuralyn_btn_bg_color|escape:'html':'UTF-8'}; color: {$neuralyn_btn_text_color|escape:'html':'UTF-8'};"{/if}>
+        {l s='Prove em você' mod='neuralyn_tryon'}
     </button>
 </div>

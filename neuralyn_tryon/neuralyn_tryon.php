@@ -32,8 +32,21 @@ class NeuralynTryon extends Module
     const CONFIG_CONNECTION_ID = 'NEURALYN_TRYON_CONNECTION_ID';
     const CONFIG_CONNECTION_ID_EXPIRE = 'NEURALYN_TRYON_CONNECTION_ID_EXPIRE';
     const CONFIG_HOOKS_ENABLED = 'NEURALYN_TRYON_HOOKS_ENABLED';
+    const CONFIG_HOOKS_LOCATION = 'NEURALYN_TRYON_HOOKS_LOCATION';
+    const CONFIG_HOOKS_SIZE = 'NEURALYN_TRYON_HOOKS_SIZE';
+    const CONFIG_BUTTON_BG_COLOR = 'NEURALYN_TRYON_BTN_BG';
+    const CONFIG_BUTTON_TEXT_COLOR = 'NEURALYN_TRYON_BTN_TEXT';
+    const CONFIG_BUTTON_COLORS_ENABLED = 'NEURALYN_TRYON_BTN_COLORS_ENABLED';
     const API_BASE_URL_ENV = 'NEURALYN_TRYON_API_BASE_URL';
     const WEB_BASE_URL_ENV = 'NEURALYN_TRYON_WEB_URL';
+
+    const LOCATION_PRODUCT = 'product';
+    const LOCATION_LISTING = 'listing';
+    const LOCATION_BOTH = 'both';
+
+    const SIZE_DEFAULT = 'default';
+    const SIZE_SMALL = 'small';
+    const SIZE_TINY = 'tiny';
 
     /**
      * Available hooks for widget placement with descriptions.
@@ -41,24 +54,27 @@ class NeuralynTryon extends Module
      * @var array<string, string>
      */
     public static $availableHooks = [
-        'displayHeader' => 'Inserido dentro do <head> da página, para carregar CSS/JS de módulos.',
-        'displayReassurance' => 'Aparece logo abaixo da breadcrumb, antes da área principal do produto.',
-        'displayProductCover' => 'Envolve a imagem principal grande do produto, no lado esquerdo.',
+        'displayProductPriceBlock_after_price' => 'Renderizado imediatamente após o preço final.',
         'displayAfterProductThumbs' => 'Renderizado logo depois da lista de thumbnails da galeria.',
-        'displayProductThumbs' => 'Inserido durante o loop das miniaturas, após cada thumbnail.',
-        'displayProductPriceBlock_before_price' => 'Mostrado imediatamente antes de qualquer preço aparecer.',
-        'displayProductPriceAndShipping' => 'Bloco principal que contém o preço atual e informações de envio.',
+        'displayReassurance' => 'Aparece logo abaixo da breadcrumb, antes da área principal do produto.',
+        'displayProductAdditionalInfo' => 'Inserido logo abaixo da área de botões (informações extras).',
+        'displayProductExtraContent' => 'Adiciona novas abas (tabs) ou conteúdo nas abas do produto.',
         'displayProductPriceBlock_old_price' => 'Mostrado no local do preço antigo riscado (para promoções).',
+        'displayProductPriceBlock_before_price' => 'Mostrado imediatamente antes de qualquer preço aparecer.',
         'displayProductPriceBlock_unit_price' => 'Exibido onde aparece o preço por unidade (ex: por litro).',
         'displayProductPriceBlock_weight' => 'Exibido onde aparece o preço baseado no peso.',
-        'displayProductPriceBlock_after_price' => 'Renderizado imediatamente após o preço final.',
-        'displayProductVariants' => 'Posicionado na área de seleção de combinações (cor, tamanho, etc.).',
-        'displayProductButtons' => 'Mostrado logo abaixo do botão "Adicionar ao carrinho".',
-        'displayProductAdditionalInfo' => 'Inserido logo abaixo da área de botões (informações extras).',
-        'displayProductCustomizationForm' => 'Renderizado dentro do bloco de personalização do produto.',
-        'displayProductExtraContent' => 'Adiciona novas abas (tabs) ou conteúdo nas abas do produto.',
-        'displayProductPackContent' => 'Mostrado na seção de produtos incluídos no pack (quando o produto é um pack).',
-        'displayFooter' => 'Inserido no rodapé da página, antes de fechar o <body>.',
+    ];
+
+    /**
+     * Hooks that have location options (product page, listing, or both).
+     *
+     * @var array<string>
+     */
+    public static $hooksWithLocationOption = [
+        'displayProductPriceBlock_old_price',
+        'displayProductPriceBlock_before_price',
+        'displayProductPriceBlock_unit_price',
+        'displayProductPriceBlock_weight',
     ];
 
     /**
@@ -139,6 +155,25 @@ class NeuralynTryon extends Module
         $defaultEnabledHooks = array_keys(self::$availableHooks);
         Configuration::updateValue(self::CONFIG_HOOKS_ENABLED, json_encode($defaultEnabledHooks));
 
+        // Set default location for hooks with location option
+        $defaultLocations = [];
+        foreach (self::$hooksWithLocationOption as $hookName) {
+            $defaultLocations[$hookName] = self::LOCATION_PRODUCT;
+        }
+        Configuration::updateValue(self::CONFIG_HOOKS_LOCATION, json_encode($defaultLocations));
+
+        // Set default sizes for all hooks
+        $defaultSizes = [];
+        foreach (array_keys(self::$availableHooks) as $hookName) {
+            $defaultSizes[$hookName] = self::SIZE_DEFAULT;
+        }
+        Configuration::updateValue(self::CONFIG_HOOKS_SIZE, json_encode($defaultSizes));
+
+        // Set default button design
+        Configuration::updateValue(self::CONFIG_BUTTON_BG_COLOR, '#000000');
+        Configuration::updateValue(self::CONFIG_BUTTON_TEXT_COLOR, '#ffffff');
+        Configuration::updateValue(self::CONFIG_BUTTON_COLORS_ENABLED, '1');
+
         return true;
     }
 
@@ -173,6 +208,11 @@ class NeuralynTryon extends Module
         Configuration::deleteByName(self::CONFIG_CONNECTION_ID);
         Configuration::deleteByName(self::CONFIG_CONNECTION_ID_EXPIRE);
         Configuration::deleteByName(self::CONFIG_HOOKS_ENABLED);
+        Configuration::deleteByName(self::CONFIG_HOOKS_LOCATION);
+        Configuration::deleteByName(self::CONFIG_HOOKS_SIZE);
+        Configuration::deleteByName(self::CONFIG_BUTTON_BG_COLOR);
+        Configuration::deleteByName(self::CONFIG_BUTTON_TEXT_COLOR);
+        Configuration::deleteByName(self::CONFIG_BUTTON_COLORS_ENABLED);
     }
 
     /**
@@ -347,6 +387,10 @@ class NeuralynTryon extends Module
      */
     public function hookDisplayProductExtraContent($params)
     {
+        if ($this->isExcludedPage()) {
+            return [];
+        }
+
         if (!$this->isHookEnabled('displayProductExtraContent')) {
             return [];
         }
@@ -429,6 +473,202 @@ class NeuralynTryon extends Module
     }
 
     /**
+     * Get hook locations configuration.
+     *
+     * @return array
+     */
+    public function getHookLocations()
+    {
+        $locations = Configuration::get(self::CONFIG_HOOKS_LOCATION);
+        if (empty($locations)) {
+            $default = [];
+            foreach (self::$hooksWithLocationOption as $hookName) {
+                $default[$hookName] = self::LOCATION_PRODUCT;
+            }
+
+            return $default;
+        }
+
+        $decoded = json_decode($locations, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Get location for a specific hook.
+     *
+     * @param string $hookName
+     *
+     * @return string
+     */
+    public function getHookLocation($hookName)
+    {
+        $locations = $this->getHookLocations();
+
+        return isset($locations[$hookName]) ? $locations[$hookName] : self::LOCATION_PRODUCT;
+    }
+
+    /**
+     * Save hook locations configuration.
+     *
+     * @param array $locations
+     *
+     * @return bool
+     */
+    public function saveHookLocations(array $locations)
+    {
+        return Configuration::updateValue(self::CONFIG_HOOKS_LOCATION, json_encode($locations));
+    }
+
+    /**
+     * Get hook sizes configuration.
+     *
+     * @return array
+     */
+    public function getHookSizes()
+    {
+        $sizes = Configuration::get(self::CONFIG_HOOKS_SIZE);
+        if (empty($sizes)) {
+            $default = [];
+            foreach (array_keys(self::$availableHooks) as $hookName) {
+                $default[$hookName] = self::SIZE_DEFAULT;
+            }
+
+            return $default;
+        }
+
+        $decoded = json_decode($sizes, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Get size for a specific hook.
+     *
+     * @param string $hookName
+     *
+     * @return string
+     */
+    public function getHookSize($hookName)
+    {
+        $sizes = $this->getHookSizes();
+
+        return isset($sizes[$hookName]) ? $sizes[$hookName] : self::SIZE_DEFAULT;
+    }
+
+    /**
+     * Save hook sizes configuration.
+     *
+     * @param array $sizes
+     *
+     * @return bool
+     */
+    public function saveHookSizes(array $sizes)
+    {
+        return Configuration::updateValue(self::CONFIG_HOOKS_SIZE, json_encode($sizes));
+    }
+
+    /**
+     * Get button design configuration.
+     *
+     * @return array
+     */
+    public function getButtonConfig()
+    {
+        return [
+            'bg_color' => Configuration::get(self::CONFIG_BUTTON_BG_COLOR) ?: '#000000',
+            'text_color' => Configuration::get(self::CONFIG_BUTTON_TEXT_COLOR) ?: '#ffffff',
+            'colors_enabled' => (bool) Configuration::get(self::CONFIG_BUTTON_COLORS_ENABLED),
+        ];
+    }
+
+    /**
+     * Save button design configuration.
+     *
+     * @param bool $colorsEnabled
+     * @param string $bgColor
+     * @param string $textColor
+     *
+     * @return bool
+     */
+    public function saveButtonConfig($colorsEnabled, $bgColor, $textColor)
+    {
+        Configuration::updateValue(self::CONFIG_BUTTON_COLORS_ENABLED, $colorsEnabled ? '1' : '0');
+        Configuration::updateValue(self::CONFIG_BUTTON_BG_COLOR, $bgColor);
+        Configuration::updateValue(self::CONFIG_BUTTON_TEXT_COLOR, $textColor);
+
+        return true;
+    }
+
+    /**
+     * Check if current page is excluded (cart, checkout, order).
+     *
+     * @return bool
+     */
+    protected function isExcludedPage()
+    {
+        $controller = Dispatcher::getInstance()->getController();
+        $excluded = ['cart', 'order', 'orderopc', 'checkout', 'order-confirmation'];
+
+        return in_array($controller, $excluded);
+    }
+
+    /**
+     * Check if current page is a product page.
+     *
+     * @return bool
+     */
+    protected function isProductPage()
+    {
+        $controller = Dispatcher::getInstance()->getController();
+
+        return $controller === 'product';
+    }
+
+    /**
+     * Check if current page is a listing page.
+     *
+     * @return bool
+     */
+    protected function isListingPage()
+    {
+        $controller = Dispatcher::getInstance()->getController();
+        $listings = ['category', 'search', 'manufacturer', 'supplier', 'new-products', 'prices-drop', 'best-sales'];
+
+        return in_array($controller, $listings);
+    }
+
+    /**
+     * Check if hook should be displayed based on location settings.
+     *
+     * @param string $hookName
+     *
+     * @return bool
+     */
+    protected function shouldDisplayHookByLocation($hookName)
+    {
+        if (!in_array($hookName, self::$hooksWithLocationOption)) {
+            return true;
+        }
+
+        $location = $this->getHookLocation($hookName);
+
+        if ($location === self::LOCATION_BOTH) {
+            return true;
+        }
+
+        if ($location === self::LOCATION_PRODUCT && $this->isProductPage()) {
+            return true;
+        }
+
+        if ($location === self::LOCATION_LISTING && $this->isListingPage()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Render a hook button for testing.
      *
      * @param string $hookName
@@ -437,12 +677,35 @@ class NeuralynTryon extends Module
      */
     protected function renderHookButton($hookName)
     {
+        // Never show on cart, checkout, or order pages
+        if ($this->isExcludedPage()) {
+            return '';
+        }
+
+        // Check if hook is enabled
         if (!$this->isHookEnabled($hookName)) {
             return '';
         }
 
+        // displayReassurance only on product page
+        if ($hookName === 'displayReassurance' && !$this->isProductPage()) {
+            return '';
+        }
+
+        // Check location settings for hooks with location option
+        if (!$this->shouldDisplayHookByLocation($hookName)) {
+            return '';
+        }
+
+        $buttonConfig = $this->getButtonConfig();
+        $size = $this->getHookSize($hookName);
+
         $this->context->smarty->assign([
             'neuralyn_hook_name' => $hookName,
+            'neuralyn_button_size' => $size,
+            'neuralyn_btn_colors_enabled' => $buttonConfig['colors_enabled'],
+            'neuralyn_btn_bg_color' => $buttonConfig['bg_color'],
+            'neuralyn_btn_text_color' => $buttonConfig['text_color'],
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/button.tpl');
@@ -466,6 +729,7 @@ class NeuralynTryon extends Module
         $this->context->smarty->assign([
             'neuralyn_tryon_domain' => $domain,
             'neuralyn_tryon_store_id' => $storeId,
+            'neuralyn_front_css_url' => $this->_path . 'views/css/front.css',
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/header.tpl');
@@ -482,12 +746,43 @@ class NeuralynTryon extends Module
         if (Tools::isSubmit('submitNeuralynHooks')) {
             $enabledHooks = [];
             foreach (array_keys(self::$availableHooks) as $hookName) {
-                if (Tools::getValue('hook_' . $hookName)) {
+                if (Tools::getValue('hook_' . $hookName) === '1') {
                     $enabledHooks[] = $hookName;
                 }
             }
             $this->saveEnabledHooks($enabledHooks);
+
+            // Save hook locations
+            $hookLocations = [];
+            foreach (self::$hooksWithLocationOption as $hookName) {
+                $location = Tools::getValue('hook_location_' . $hookName, self::LOCATION_PRODUCT);
+                if (in_array($location, [self::LOCATION_PRODUCT, self::LOCATION_LISTING, self::LOCATION_BOTH])) {
+                    $hookLocations[$hookName] = $location;
+                }
+            }
+            $this->saveHookLocations($hookLocations);
+
+            // Save hook sizes
+            $hookSizes = [];
+            foreach (array_keys(self::$availableHooks) as $hookName) {
+                $size = Tools::getValue('hook_size_' . $hookName, self::SIZE_DEFAULT);
+                if (in_array($size, [self::SIZE_DEFAULT, self::SIZE_SMALL, self::SIZE_TINY])) {
+                    $hookSizes[$hookName] = $size;
+                }
+            }
+            $this->saveHookSizes($hookSizes);
+
             $output .= $this->displayConfirmation($this->l('Hook settings have been saved.'));
+        }
+
+        // Handle button design form submission
+        if (Tools::isSubmit('submitNeuralynButtonDesign')) {
+            $colorsEnabled = Tools::getValue('btn_colors_enabled') === '1';
+            $bgColor = Tools::getValue('btn_bg_color', '#000000');
+            $textColor = Tools::getValue('btn_text_color', '#ffffff');
+
+            $this->saveButtonConfig($colorsEnabled, $bgColor, $textColor);
+            $output .= $this->displayConfirmation($this->l('Button design settings have been saved.'));
         }
 
         // Handle success message from callback redirect
@@ -507,14 +802,22 @@ class NeuralynTryon extends Module
 
         // Prepare hooks configuration data
         $enabledHooks = $this->getEnabledHooks();
+        $hookLocations = $this->getHookLocations();
+        $hookSizes = $this->getHookSizes();
         $hooksConfig = [];
         foreach (self::$availableHooks as $hookName => $description) {
             $hooksConfig[] = [
                 'name' => $hookName,
                 'description' => $description,
                 'enabled' => in_array($hookName, $enabledHooks),
+                'has_location_option' => in_array($hookName, self::$hooksWithLocationOption),
+                'location' => isset($hookLocations[$hookName]) ? $hookLocations[$hookName] : self::LOCATION_PRODUCT,
+                'size' => isset($hookSizes[$hookName]) ? $hookSizes[$hookName] : self::SIZE_DEFAULT,
             ];
         }
+
+        // Get button design config
+        $buttonConfig = $this->getButtonConfig();
 
         $this->context->smarty->assign([
             'connect_url' => $this->context->link->getModuleLink($this->name, 'connect', [], true),
@@ -525,6 +828,15 @@ class NeuralynTryon extends Module
             'license_key' => $licenseKey,
             'manage_url' => $manageUrl,
             'hooks_config' => $hooksConfig,
+            'location_product' => self::LOCATION_PRODUCT,
+            'location_listing' => self::LOCATION_LISTING,
+            'location_both' => self::LOCATION_BOTH,
+            'size_default' => self::SIZE_DEFAULT,
+            'size_small' => self::SIZE_SMALL,
+            'size_tiny' => self::SIZE_TINY,
+            'btn_bg_color' => $buttonConfig['bg_color'],
+            'btn_text_color' => $buttonConfig['text_color'],
+            'btn_colors_enabled' => $buttonConfig['colors_enabled'],
         ]);
 
         $output .= $this->display(__FILE__, 'views/templates/admin/configure.tpl');
@@ -606,7 +918,7 @@ class NeuralynTryon extends Module
     {
         $url = getenv(self::API_BASE_URL_ENV);
         if (!$url) {
-            $url = 'http://localhost:8787';
+            $url = 'http://host.docker.internal:8787';
         }
 
         return rtrim($url, '/');
@@ -716,6 +1028,10 @@ class NeuralynTryon extends Module
             'customers' => ['GET' => 1],
             'orders' => ['GET' => 1],
             'products' => ['GET' => 1],
+            'images' => ['GET' => 1],
+            'image_types' => ['GET' => 1],
+            'languages' => ['GET' => 1],
+            'search' => ['GET' => 1],
         ];
 
         if (method_exists('WebserviceKey', 'setPermissionForAccount')) {
