@@ -1,0 +1,80 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get current version
+        id: current
+        run: |
+          VERSION=$(grep -oP '(?<=<version><!\[CDATA\[)[^]]+' config.xml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: new
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ steps.current.outputs.version }}"
+          case "${{ inputs.bump_type }}" in
+            major) new_version="$((major + 1)).0.0" ;;
+            minor) new_version="${major}.$((minor + 1)).0" ;;
+            patch) new_version="${major}.${minor}.$((patch + 1))" ;;
+          esac
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Create branch
+        run: |
+          git checkout -b bump/v${{ steps.new.outputs.version }}
+
+      - name: Update config.xml
+        run: |
+          sed -i "s/<version><!\[CDATA\[[^]]*\]\]>/<version><![CDATA[${{ steps.new.outputs.version }}]]>/" config.xml
+
+      - name: Update neuralyn_tryon.php
+        run: |
+          sed -i "s/\$this->version = '[^']*'/\$this->version = '${{ steps.new.outputs.version }}'/" neuralyn_tryon.php
+
+      - name: Commit and push branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config.xml neuralyn_tryon.php
+          git commit -m "Bump version to ${{ steps.new.outputs.version }}"
+          git push -u origin bump/v${{ steps.new.outputs.version }}
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "Bump version to ${{ steps.new.outputs.version }}" \
+            --body "## Version Bump
+
+          This PR updates the module version from \`${{ steps.current.outputs.version }}\` to \`${{ steps.new.outputs.version }}\`.
+
+          ### Files changed:
+          - \`config.xml\`
+          - \`neuralyn_tryon.php\`
+
+          ### What happens next:
+          When this PR is merged, a new release **v${{ steps.new.outputs.version }}** will be created automatically with the module zip attached.
+
+          ---
+          *This PR was created automatically by the Bump Version workflow.*" \
+            --base main \
+            --head bump/v${{ steps.new.outputs.version }}
