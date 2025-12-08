@@ -1,0 +1,68 @@
+name: Create Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from config.xml
+        id: version
+        run: |
+          VERSION=$(grep -oP '(?<=<version><!\[CDATA\[)[^]]+' config.xml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "v${{ steps.version.outputs.version }}" &>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail if release exists
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "::error::Release v${{ steps.version.outputs.version }} already exists!"
+          echo ""
+          echo "You need to update the version number in:"
+          echo "  - config.xml (line 5)"
+          echo "  - neuralyn_tryon.php (line 113)"
+          echo ""
+          echo "Or run the 'Bump Version' workflow manually:"
+          echo "  https://github.com/${{ github.repository }}/actions/workflows/bump-version.yml"
+          exit 1
+
+      - name: Create module directory and zip
+        run: |
+          mkdir -p neuralyn_tryon
+          # Copy all module files
+          cp -r controllers neuralyn_tryon/
+          cp -r views neuralyn_tryon/
+          cp -r upgrade neuralyn_tryon/
+          cp -r translations neuralyn_tryon/
+          cp neuralyn_tryon.php neuralyn_tryon/
+          cp config.xml neuralyn_tryon/
+          cp index.php neuralyn_tryon/
+          cp logo.png neuralyn_tryon/
+          cp license.txt neuralyn_tryon/ 2>/dev/null || true
+          # Create zip
+          zip -r neuralyn_tryon.zip neuralyn_tryon
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            neuralyn_tryon.zip \
+            --title "Neuralyn TRYON v${{ steps.version.outputs.version }}" \
+            --generate-notes

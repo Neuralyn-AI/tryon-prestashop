@@ -82,11 +82,22 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
             $this->jsonResponse(false, 'INVALID_CONNECTION_ID', $this->module->l('Invalid connection ID.', 'callback'));
         }
 
+        // Generate and create WebService key
+        $webserviceKey = Tools::passwdGen(32);
+        if (!$this->module->createWebserviceKey($webserviceKey)) {
+            $this->jsonResponse(false, 'WEBSERVICE_KEY_CREATION_FAILED', $this->module->l('Failed to create WebService key.', 'callback'));
+        }
+
         // Save keys
         $this->module->saveKeys($data['licenseKey'], $data['encryptKey']);
 
-        // Return success (no redirect_url since this is a server-to-server call)
-        $this->jsonResponse(true);
+        // Return success with platform data
+        $this->jsonResponseSuccess([
+            'webservice_key' => $webserviceKey,
+            'platform' => 'prestashop',
+            'platform_version' => _PS_VERSION_,
+            'module_version' => $this->module->version,
+        ]);
     }
 
     /**
@@ -101,26 +112,21 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Send JSON response.
+     * Send JSON error response.
      *
      * @param bool $success
      * @param string|null $errorCode
      * @param string|null $message
      * @param int $statusCode
-     * @param string|null $redirectUrl
      *
      * @return void
      */
-    protected function jsonResponse($success, $errorCode = null, $message = null, $statusCode = 200, $redirectUrl = null)
+    protected function jsonResponse($success, $errorCode = null, $message = null, $statusCode = 200)
     {
         http_response_code($statusCode);
         header('Content-Type: application/json');
 
         $response = ['success' => $success];
-
-        if ($success && $redirectUrl) {
-            $response['redirect_url'] = $redirectUrl;
-        }
 
         if (!$success) {
             $response['error_code'] = $errorCode;
@@ -134,6 +140,32 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
         PrestaShopLogger::addLog(
             'Neuralyn TRYON callback response: ' . $jsonResponse,
             $logLevel,
+            null,
+            'NeuralynTryon'
+        );
+
+        echo $jsonResponse;
+        exit;
+    }
+
+    /**
+     * Send JSON success response with additional data.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    protected function jsonResponseSuccess(array $data)
+    {
+        http_response_code(200);
+        header('Content-Type: application/json');
+
+        $response = array_merge(['success' => true], $data);
+        $jsonResponse = json_encode($response);
+
+        PrestaShopLogger::addLog(
+            'Neuralyn TRYON callback response: ' . $jsonResponse,
+            1, // info
             null,
             'NeuralynTryon'
         );

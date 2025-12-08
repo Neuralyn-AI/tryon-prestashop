@@ -37,8 +37,9 @@ class NeuralynTryon extends Module
     const CONFIG_BUTTON_BG_COLOR = 'NEURALYN_TRYON_BTN_BG';
     const CONFIG_BUTTON_TEXT_COLOR = 'NEURALYN_TRYON_BTN_TEXT';
     const CONFIG_BUTTON_COLORS_ENABLED = 'NEURALYN_TRYON_BTN_COLORS_ENABLED';
-    const API_BASE_URL_ENV = 'NEURALYN_TRYON_API_BASE_URL';
-    const WEB_BASE_URL_ENV = 'NEURALYN_TRYON_WEB_URL';
+    const CONFIG_API_BASE_URL = 'NEURALYN_TRYON_API_BASE_URL';
+    const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
+    const NEURALYN_CONNECT_WEB_BASE_URL = 'https://tryon.neuralyn.com';
 
     const LOCATION_PRODUCT = 'product';
     const LOCATION_LISTING = 'listing';
@@ -798,7 +799,7 @@ class NeuralynTryon extends Module
 
         $isConnected = $this->isConnected();
         $licenseKey = Configuration::get(self::CONFIG_LICENSE_KEY);
-        $manageUrl = $this->getWebBaseUrl() . '/tryon/manage/?licenseKey=' . urlencode($licenseKey);
+        $manageUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/tryon/manage/?licenseKey=' . urlencode($licenseKey);
 
         // Prepare hooks configuration data
         $enabledHooks = $this->getEnabledHooks();
@@ -910,82 +911,31 @@ class NeuralynTryon extends Module
     }
 
     /**
-     * Get the API base URL from environment variable.
-     *
-     * @return string
-     */
-    public function getApiBaseUrl()
-    {
-        $url = getenv(self::API_BASE_URL_ENV);
-        if (!$url) {
-            $url = 'http://host.docker.internal:8787';
-        }
-
-        return rtrim($url, '/');
-    }
-
-    /**
-     * Get the Web base URL from environment variable.
-     *
-     * @return string
-     */
-    public function getWebBaseUrl()
-    {
-        $url = getenv(self::WEB_BASE_URL_ENV);
-        if (!$url) {
-            $url = 'http://localhost:3000';
-        }
-
-        return rtrim($url, '/');
-    }
-
-    /**
-     * Connect to Neuralyn API and return redirect URL.
+     * Connect to Neuralyn and return redirect URL.
      *
      * @return array
      */
     public function connect()
     {
         $connectionId = Tools::passwdGen(64);
-        $webserviceKey = Tools::passwdGen(32);
         $connectionIdExpire = time() + (15 * 60); // 15 minutes from now
 
         // Save connection_id and expiration for later validation
         Configuration::updateValue(self::CONFIG_CONNECTION_ID, $connectionId);
         Configuration::updateValue(self::CONFIG_CONNECTION_ID_EXPIRE, $connectionIdExpire);
 
-        if (!$this->createWebserviceKey($webserviceKey)) {
-            return ['success' => false, 'error' => $this->l('Failed to create WebService key.')];
-        }
-
         $domain = Tools::getShopDomainSsl(true);
         $domain = preg_replace('#^https?://#', '', $domain);
         $domain = rtrim($domain, '/');
 
-        $payload = [
+        $redirectUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/connect?' . http_build_query([
             'connection_id' => $connectionId,
-            'webservice_key' => $webserviceKey,
             'domain' => $domain,
-            'platform' => 'prestashop',
-            'platform_version' => _PS_VERSION_,
-            'module_version' => $this->version,
             'service_token' => 'tryon',
-            'callback_url' => $this->context->link->getModuleLink($this->name, 'callback', [], true),
-        ];
+            'platform' => 'prestashop',
+        ]);
 
-        $apiUrl = $this->getApiBaseUrl() . '/encrypt-webservice-key';
-        $response = $this->callExternalApi($apiUrl, $payload);
-
-        if (!$response['success']) {
-            return ['success' => false, 'error' => isset($response['error']) ? $response['error'] : $this->l('API request failed.')];
-        }
-
-        $data = json_decode($response['response'], true);
-        if (!isset($data['redirect_url'])) {
-            return ['success' => false, 'error' => $this->l('Invalid API response.')];
-        }
-
-        return ['success' => true, 'redirect_url' => $data['redirect_url']];
+        return ['success' => true, 'redirect_url' => $redirectUrl];
     }
 
     /**
@@ -995,7 +945,7 @@ class NeuralynTryon extends Module
      *
      * @return bool
      */
-    protected function createWebserviceKey($key)
+    public function createWebserviceKey($key)
     {
         if (!class_exists('WebserviceKey')) {
             return false;
