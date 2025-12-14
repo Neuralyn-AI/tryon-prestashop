@@ -26,9 +26,10 @@ NeuralynTryon::registerAlias();
 
 class NeuralynTryon extends Module
 {
+    public $cached = false;
+
     const CONFIG_WS_ID = 'NEURALYN_TRYON_WS_ID';
     const CONFIG_LICENSE_KEY = 'NEURALYN_TRYON_LICENSE_KEY';
-    const CONFIG_ENCRYPT_KEY = 'NEURALYN_TRYON_ENCRYPT_KEY';
     const CONFIG_CONNECTION_ID = 'NEURALYN_TRYON_CONNECTION_ID';
     const CONFIG_CONNECTION_ID_EXPIRE = 'NEURALYN_TRYON_CONNECTION_ID_EXPIRE';
     const CONFIG_HOOKS_ENABLED = 'NEURALYN_TRYON_HOOKS_ENABLED';
@@ -37,9 +38,11 @@ class NeuralynTryon extends Module
     const CONFIG_BUTTON_BG_COLOR = 'NEURALYN_TRYON_BTN_BG';
     const CONFIG_BUTTON_TEXT_COLOR = 'NEURALYN_TRYON_BTN_TEXT';
     const CONFIG_BUTTON_COLORS_ENABLED = 'NEURALYN_TRYON_BTN_COLORS_ENABLED';
+    const CONFIG_BUYER_ORDER_STATUSES = 'NEURALYN_TRYON_BUYER_ORDER_STATUSES';
     const CONFIG_API_BASE_URL = 'NEURALYN_TRYON_API_BASE_URL';
     const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
-    const NEURALYN_CONNECT_WEB_BASE_URL = 'https://tryon.neuralyn.com';
+    const NEURALYN_CONNECT_WEB_BASE_URL = 'http://127.0.0.1:7171';
+    const NEURALYN_CDN_URL = 'http://localhost:5173';
 
     const LOCATION_PRODUCT = 'product';
     const LOCATION_LISTING = 'listing';
@@ -110,12 +113,12 @@ class NeuralynTryon extends Module
     public function __construct()
     {
         $this->name = 'neuralyn_tryon';
-        $this->tab = 'administration';
+        $this->tab = 'front_office_features';
         $this->version = '1.0.0';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
-        $this->ps_versions_compliancy = ['min' => '1.6.0.0', 'max' => _PS_VERSION_];
+        $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
 
         parent::__construct();
 
@@ -144,6 +147,20 @@ class NeuralynTryon extends Module
     {
         if (!parent::install()) {
             return false;
+        }
+
+        // Register widget hook
+        $this->registerHook('displayFooterProduct');
+
+        // Add UUID field to customers table, if not exists
+        $columns = Db::getInstance()->executeS('SHOW COLUMNS FROM `'._DB_PREFIX_.'customer` LIKE "neuralyn_tryon_uuid"');
+
+        if (!$columns) {
+            $sql = 'ALTER TABLE `'._DB_PREFIX_.'customer`
+                    ADD `neuralyn_tryon_uuid` VARCHAR(255) NULL';
+            if (!Db::getInstance()->execute($sql)) {
+                return false;
+            }
         }
 
         foreach ($this->hooks as $hook) {
@@ -175,6 +192,10 @@ class NeuralynTryon extends Module
         Configuration::updateValue(self::CONFIG_BUTTON_TEXT_COLOR, '#ffffff');
         Configuration::updateValue(self::CONFIG_BUTTON_COLORS_ENABLED, '1');
 
+        // Set default buyer order statuses (paid, shipped, delivered)
+        $defaultBuyerStatuses = $this->getDefaultBuyerStatuses();
+        Configuration::updateValue(self::CONFIG_BUYER_ORDER_STATUSES, json_encode($defaultBuyerStatuses));
+
         return true;
     }
 
@@ -205,7 +226,6 @@ class NeuralynTryon extends Module
 
         Configuration::deleteByName(self::CONFIG_WS_ID);
         Configuration::deleteByName(self::CONFIG_LICENSE_KEY);
-        Configuration::deleteByName(self::CONFIG_ENCRYPT_KEY);
         Configuration::deleteByName(self::CONFIG_CONNECTION_ID);
         Configuration::deleteByName(self::CONFIG_CONNECTION_ID_EXPIRE);
         Configuration::deleteByName(self::CONFIG_HOOKS_ENABLED);
@@ -214,6 +234,7 @@ class NeuralynTryon extends Module
         Configuration::deleteByName(self::CONFIG_BUTTON_BG_COLOR);
         Configuration::deleteByName(self::CONFIG_BUTTON_TEXT_COLOR);
         Configuration::deleteByName(self::CONFIG_BUTTON_COLORS_ENABLED);
+        Configuration::deleteByName(self::CONFIG_BUYER_ORDER_STATUSES);
     }
 
     /**
@@ -602,6 +623,54 @@ class NeuralynTryon extends Module
     }
 
     /**
+     * Get buyer order statuses configuration.
+     *
+     * @return array
+     */
+    public function getBuyerOrderStatuses()
+    {
+        $statuses = Configuration::get(self::CONFIG_BUYER_ORDER_STATUSES);
+        if (empty($statuses)) {
+            return [];
+        }
+
+        $decoded = json_decode($statuses, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Save buyer order statuses configuration.
+     *
+     * @param array $statuses
+     *
+     * @return bool
+     */
+    public function saveBuyerOrderStatuses(array $statuses)
+    {
+        return Configuration::updateValue(self::CONFIG_BUYER_ORDER_STATUSES, json_encode($statuses));
+    }
+
+    /**
+     * Get default buyer order statuses (paid, shipped, or delivered).
+     *
+     * @return array
+     */
+    private function getDefaultBuyerStatuses()
+    {
+        $defaultStatuses = [];
+        $orderStates = OrderState::getOrderStates($this->context->language->id);
+
+        foreach ($orderStates as $state) {
+            if (!empty($state['paid']) || !empty($state['shipped']) || !empty($state['delivery'])) {
+                $defaultStatuses[] = (int) $state['id_order_state'];
+            }
+        }
+
+        return $defaultStatuses;
+    }
+
+    /**
      * Check if current page is excluded (cart, checkout, order).
      *
      * @return bool
@@ -786,6 +855,16 @@ class NeuralynTryon extends Module
             $output .= $this->displayConfirmation($this->l('Button design settings have been saved.'));
         }
 
+        // Handle buyer order statuses form submission
+        if (Tools::isSubmit('submitNeuralynBuyerStatuses')) {
+            $selectedStatuses = Tools::getValue('buyer_order_statuses');
+            if (!is_array($selectedStatuses)) {
+                $selectedStatuses = [];
+            }
+            $this->saveBuyerOrderStatuses(array_map('intval', $selectedStatuses));
+            $output .= $this->displayConfirmation($this->l('Buyer order statuses have been saved.'));
+        }
+
         // Handle success message from callback redirect
         if (Tools::getValue('neuralyn_success')) {
             $output .= $this->displayConfirmation($this->l('Your store has been successfully connected to Neuralyn TRYON.'));
@@ -820,6 +899,10 @@ class NeuralynTryon extends Module
         // Get button design config
         $buttonConfig = $this->getButtonConfig();
 
+        // Get order states for buyer statuses config
+        $orderStates = OrderState::getOrderStates($this->context->language->id);
+        $buyerOrderStatuses = $this->getBuyerOrderStatuses();
+
         $this->context->smarty->assign([
             'connect_url' => $this->context->link->getModuleLink($this->name, 'connect', [], true),
             'ps_version' => _PS_VERSION_,
@@ -838,6 +921,8 @@ class NeuralynTryon extends Module
             'btn_bg_color' => $buttonConfig['bg_color'],
             'btn_text_color' => $buttonConfig['text_color'],
             'btn_colors_enabled' => $buttonConfig['colors_enabled'],
+            'order_states' => $orderStates,
+            'buyer_order_statuses' => $buyerOrderStatuses,
         ]);
 
         $output .= $this->display(__FILE__, 'views/templates/admin/configure.tpl');
@@ -891,17 +976,15 @@ class NeuralynTryon extends Module
     }
 
     /**
-     * Save keys from callback.
+     * Save license key from callback.
      *
      * @param string $licenseKey
-     * @param string $encryptKey
      *
      * @return bool
      */
-    public function saveKeys($licenseKey, $encryptKey)
+    public function saveKeys($licenseKey)
     {
         Configuration::updateValue(self::CONFIG_LICENSE_KEY, $licenseKey);
-        Configuration::updateValue(self::CONFIG_ENCRYPT_KEY, $encryptKey);
 
         // Clear connection_id after successful use
         Configuration::deleteByName(self::CONFIG_CONNECTION_ID);
@@ -928,8 +1011,8 @@ class NeuralynTryon extends Module
         $domain = preg_replace('#^https?://#', '', $domain);
         $domain = rtrim($domain, '/');
 
-        $redirectUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/connect?' . http_build_query([
-            'connection_id' => $connectionId,
+        $redirectUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/connect/tryon?' . http_build_query([
+            'connectionId' => $connectionId,
             'domain' => $domain,
             'service_token' => 'tryon',
             'platform' => 'prestashop',
@@ -1073,5 +1156,105 @@ class NeuralynTryon extends Module
         }
 
         return ['success' => true, 'status' => $status, 'response' => $response];
+    }
+
+    private function getCustomerUUID($customerId)
+    {
+        $cacheKey = 'neuralyn_tryon_uuid_' . (int)$customerId;
+        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_' . (int)$customerId;
+
+        // Look for UUID in the cache
+        if (Cache::isStored($cacheKey)) {
+            return Cache::retrieve($cacheKey);
+        }
+
+        if (Cache::isStored($negativeCacheKey)) {
+            return false;
+        }
+
+        // If it is not in cache, get from DB
+        $uuid = Db::getInstance()->getValue('
+            SELECT neuralyn_tryon_uuid 
+            FROM '._DB_PREFIX_.'customer 
+            WHERE id_customer = '.(int)$customerId
+        );
+
+        if ($uuid) {
+            // Stores for 30 minutes
+            Cache::store($cacheKey, $uuid);
+        } else {
+            Cache::store($negativeCacheKey, "1");
+        }
+
+        return $uuid;
+    }
+
+    /**
+     * Get the customer type based on order history.
+     *
+     * @param int|null $customerId
+     *
+     * @return string guest|registered|buyer
+     */
+    public function getCustomerType($customerId)
+    {
+        // Guest (not logged in)
+        if (empty($customerId) || (int) $customerId <= 0) {
+            return 'guest';
+        }
+
+        $cacheKey = 'neuralyn_tryon_customer_type_' . (int) $customerId;
+
+        if (Cache::isStored($cacheKey)) {
+            return Cache::retrieve($cacheKey);
+        }
+
+        $customerType = 'registered';
+
+        $buyerStatuses = $this->getBuyerOrderStatuses();
+        if (!empty($buyerStatuses)) {
+            $statusesIn = implode(',', array_map('intval', $buyerStatuses));
+
+            $hasBuyerOrder = Db::getInstance()->getValue('
+                SELECT 1 FROM ' . _DB_PREFIX_ . 'orders
+                WHERE id_customer = ' . (int) $customerId . '
+                AND current_state IN (' . $statusesIn . ')
+                LIMIT 1
+            ');
+
+            if ($hasBuyerOrder) {
+                $customerType = 'buyer';
+            }
+        }
+
+        Cache::store($cacheKey, $customerType);
+
+        return $customerType;
+    }
+
+    public function hookDisplayFooterProduct($params)
+    {
+        if ($this->context->controller->php_self !== 'product') {
+            return '';
+        }
+
+        $licenseKey = Configuration::get(self::CONFIG_LICENSE_KEY);
+        $product = $this->context->controller->getProduct();
+        $customerId = $this->context->customer && $this->context->customer->id ? $this->context->customer->id : null;
+        $customerType = $this->getCustomerType($customerId);
+        $loginUrl = $this->context->link->getPageLink('authentication');
+        $customerUUID = $customerId ? $this->getCustomerUUID($customerId) : '';
+
+        $this->context->smarty->assign([
+            'licenseKey' => pSQL($licenseKey),
+            'productId' => $product->id,
+            'cdnUrl' => self::NEURALYN_CDN_URL,
+            'customerId' => $customerId,
+            'customerType' => $customerType,
+            'customerUUID' => $customerUUID,
+            'loginUrl' => $loginUrl,
+        ]);
+
+        return $this->display(__FILE__, 'views/templates/hook/widget.tpl');
     }
 }

@@ -146,6 +146,53 @@ The module communicates with the following Neuralyn API endpoints:
 - **Connection**: `{API_BASE_URL}/encrypt-webservice-key`
 - **Widget CDN**: `https://cdn.neuralyn.com/widget.js`
 
+### Customer UUID API
+
+The module exposes a REST API endpoint for managing customer UUIDs used by the Neuralyn platform.
+
+**Endpoint:** `index.php?fc=module&module=neuralyn_tryon&controller=api`
+
+**Authentication:** HTTP Basic Auth using PrestaShop WebService key
+
+**Request:**
+```http
+POST /module/neuralyn_tryon/api
+Content-Type: application/json
+Authorization: Basic <base64(webservice_key:)>
+
+{
+  "customerId": 123,
+  "customerUUID": "uuid-string-here"
+}
+```
+
+**Success Response:**
+```json
+{
+  "status": true,
+  "uuid": "uuid-string-here"
+}
+```
+
+**Error Response:**
+```json
+{
+  "status": false,
+  "code": "error_code",
+  "message": "Error description"
+}
+```
+
+**Error Codes:**
+
+| Code                    | HTTP | Description                          |
+|-------------------------|------|--------------------------------------|
+| `unauthorized`          | 401  | Invalid or missing WebService key    |
+| `method_not_allowed`    | 405  | Request method is not POST           |
+| `missing_parameters`    | 400  | Missing required parameters          |
+| `customer_not_found`    | 404  | Customer ID does not exist           |
+| `internal_server_error` | 500  | Database error or exception          |
+
 ## Uninstallation
 
 When uninstalling the module:
@@ -194,7 +241,8 @@ neuralyn_tryon/
 ├── controllers/
 │   └── front/
 │       ├── connect.php          # Frontend connection endpoint
-│       └── callback.php         # API callback handler
+│       ├── callback.php         # API callback handler
+│       └── api.php              # Customer UUID API endpoint
 ├── views/
 │   ├── css/
 │   │   ├── admin.css            # Admin panel styling

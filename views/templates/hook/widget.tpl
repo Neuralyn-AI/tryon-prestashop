@@ -17,9 +17,23 @@
  * @copyright © 2025 Neuralyn
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license. 
  *}
-{block name='page_content'}
-<div class="neuralyn-connect-page">
-    <h1>Neuralyn TRYON Integration</h1>
-    <p>{l s='This endpoint is used for Neuralyn TRYON integration. Please return to the back-office to initiate a connection.' mod='neuralyn_tryon'}</p>
-</div>
-{/block}
+{nocache}
+<script>
+window.TRYON_CONFIG = {
+    licenseKey: "{$licenseKey}",
+    productId: "{$productId}",
+    customerId: "{$customerId}",
+    customerUUID: "{$customerUUID}",
+    customerType: "{$customerType}",
+    loginUrl: "{$loginUrl}"
+};
+</script>
+{/nocache}
+<script>
+(function loadTryonSDK() {
+    var s = document.createElement("script");
+    s.src = "{$cdnUrl}/sdk.min.js";
+    s.async = true;
+    document.head.appendChild(s);
+})();
+</script>

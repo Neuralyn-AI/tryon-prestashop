@@ -73,7 +73,7 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
 
-        if (!$data || !isset($data['connectionId']) || !isset($data['licenseKey']) || !isset($data['encryptKey'])) {
+        if (!$data || !isset($data['connectionId']) || !isset($data['licenseKey'])) {
             $this->jsonResponse(false, 'INVALID_REQUEST_DATA', $this->module->l('Invalid request data.', 'callback'));
         }
 
@@ -88,10 +88,10 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
             $this->jsonResponse(false, 'WEBSERVICE_KEY_CREATION_FAILED', $this->module->l('Failed to create WebService key.', 'callback'));
         }
 
-        // Save keys
-        $this->module->saveKeys($data['licenseKey'], $data['encryptKey']);
+        // Save license key
+        $this->module->saveKeys($data['licenseKey']);
 
-        // Return success with platform data
+        // Return success with platform data and webservice key
         $this->jsonResponseSuccess([
             'webservice_key' => $webserviceKey,
             'platform' => 'prestashop',

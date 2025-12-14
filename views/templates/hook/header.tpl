@@ -18,10 +18,3 @@
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  *}
 <link rel="stylesheet" href="{$neuralyn_front_css_url|escape:'html':'UTF-8'}" type="text/css" />
-<script type="text/javascript">
-  window.NEURALYN_STORE = {
-    domain: '{$neuralyn_tryon_domain|escape:'html':'UTF-8'}',
-    storeId: '{$neuralyn_tryon_store_id|escape:'html':'UTF-8'}'
-  };
-</script>
-<script async src="https://cdn.neuralyn.com/widget.js"></script>
