@@ -183,9 +183,62 @@
     </form>
 </div>
 
+<div class="panel">
+    <h3><i class="icon-shopping-cart"></i> {l s='Buyer Order Statuses' mod='neuralyn_tryon'}</h3>
+    <p>{l s='Select order statuses that qualify a customer as a "buyer". Customers with at least one order in any of these statuses will be considered buyers.' mod='neuralyn_tryon'}</p>
+
+    <form method="post" action="">
+        <div class="form-group">
+            <div class="order-statuses-grid">
+                {foreach from=$order_states item=state}
+                <label class="status-checkbox-item">
+                    <input type="checkbox"
+                           name="buyer_order_statuses[]"
+                           value="{$state.id_order_state|intval}"
+                           {if in_array($state.id_order_state, $buyer_order_statuses)}checked="checked"{/if}>
+                    <span class="status-badge" style="background-color: {$state.color|escape:'html':'UTF-8'};">
+                        {$state.name|escape:'html':'UTF-8'}
+                    </span>
+                </label>
+                {/foreach}
+            </div>
+        </div>
+
+        <div class="panel-footer">
+            <button type="submit" name="submitNeuralynBuyerStatuses" class="btn btn-default pull-right">
+                <i class="process-icon-save"></i> {l s='Save' mod='neuralyn_tryon'}
+            </button>
+        </div>
+    </form>
+</div>
+
 <style>
+.order-statuses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+.status-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin: 0;
+}
+.status-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 4px;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    font-size: 14px;
+    font-weight: 500;
+}
 .neuralyn-tryon-app-button {
-    display: inline-block;
     padding: 12px 24px;
     border: none;
     cursor: pointer;
