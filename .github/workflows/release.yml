@@ -48,13 +48,13 @@ jobs:
           # Copy all module files
           cp -r controllers neuralyn_tryon/
           cp -r views neuralyn_tryon/
-          cp -r upgrade neuralyn_tryon/
           cp -r translations neuralyn_tryon/
           cp neuralyn_tryon.php neuralyn_tryon/
           cp config.xml neuralyn_tryon/
           cp index.php neuralyn_tryon/
           cp logo.png neuralyn_tryon/
-          cp license.txt neuralyn_tryon/ 2>/dev/null || true
+          cp README.md neuralyn_tryon/
+          cp LICENSE.md neuralyn_tryon/ 2>/dev/null || true
           # Create zip
           zip -r neuralyn_tryon.zip neuralyn_tryon
 
