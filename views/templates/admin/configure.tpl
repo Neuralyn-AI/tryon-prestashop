@@ -49,6 +49,66 @@
 </div>
 
 <div class="panel">
+    <h3><i class="icon-paint-brush"></i> {l s='Button Design' mod='neuralyn_tryon'}</h3>
+    <p>{l s='Choose the button style for the TRYON button.' mod='neuralyn_tryon'}</p>
+
+    <form method="post" action="">
+        <div class="button-design-container">
+            <div class="button-design-select">
+                <label for="button_style">{l s='Button Style' mod='neuralyn_tryon'}</label>
+                <select name="button_style" id="button_style" class="form-control" onchange="updateButtonPreview()">
+                    {foreach from=$button_styles key=style_key item=style_label}
+                    <option value="{$style_key|escape:'html':'UTF-8'}" {if $current_button_style == $style_key}selected="selected"{/if}>
+                        {$style_label|escape:'html':'UTF-8'}
+                    </option>
+                    {/foreach}
+                </select>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>{l s='Float Right' mod='neuralyn_tryon'}</label>
+                    <span class="switch prestashop-switch fixed-width-lg">
+                        <input type="radio" name="button_float_right" id="button_float_right_on" value="1"
+                               {if $button_float_right}checked="checked"{/if} onchange="updateButtonPreview()" />
+                        <label for="button_float_right_on">{l s='Yes' mod='neuralyn_tryon'}</label>
+                        <input type="radio" name="button_float_right" id="button_float_right_off" value="0"
+                               {if !$button_float_right}checked="checked"{/if} onchange="updateButtonPreview()" />
+                        <label for="button_float_right_off">{l s='No' mod='neuralyn_tryon'}</label>
+                        <a class="slide-button btn"></a>
+                    </span>
+                </div>
+
+                <div id="custom-style-notice" class="alert alert-info" style="margin-top: 15px; {if $current_button_style != 'custom'}display:none;{/if}">
+                    <i class="icon-info-circle"></i>
+                    {l s='Add CSS to your theme using:' mod='neuralyn_tryon'}
+                    <code>.neuralyn-tryon-app-button</code>
+                </div>
+            </div>
+
+            <div class="button-design-preview">
+                <label>{l s='Preview' mod='neuralyn_tryon'}</label>
+                <div class="preview-container">
+                    <button type="button" id="button-preview" class="neuralyn-tryon-app-button{if $current_button_style != 'custom'} neuralyn-tryon-{$current_button_style|escape:'html':'UTF-8'}-button{/if}{if $current_button_style == 'animated'} is-visible{/if}{if $button_float_right} neuralyn-tryon-app-button-float-right{/if}">
+                        {l s='Prove em você' mod='neuralyn_tryon'}
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 95" aria-hidden="true">
+                            <g transform="translate(0,95) scale(0.1,-0.1)" fill="currentColor" stroke="none">
+                                <path d="M408 863 c-46 -192 -94 -255 -225 -296 -43 -14 -98 -28 -121 -32 -55 -9 -46 -17 46 -38 189 -44 256 -115 301 -319 l18 -83 12 60 c31 152 72 236 138 279 21 14 81 37 133 51 52 15 102 29 110 32 8 2 -27 15 -79 28 -171 44 -224 93 -272 250 -46 149 -43 145 -61 68z"/>
+                                <path d="M756 415 c-10 -54 -42 -112 -71 -131 -14 -9 -51 -24 -82 -34 l-58 -18 45 -12 c105 -28 137 -59 164 -161 l14 -54 7 40 c20 99 54 138 153 171 37 13 60 23 51 23 -36 2 -121 33 -145 54 -16 14 -35 49 -49 92 l-22 69 -7 -39z"/>
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer">
+            <button type="submit" name="submitNeuralynButtonDesign" class="btn btn-default pull-right">
+                <i class="process-icon-save"></i> {l s='Save' mod='neuralyn_tryon'}
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="panel">
     <h3><i class="icon-anchor"></i> {l s='Hook Configuration' mod='neuralyn_tryon'}</h3>
     <p>{l s='Enable or disable hooks to control where the TRYON button appears on product pages.' mod='neuralyn_tryon'}</p>
 
@@ -113,77 +173,6 @@
 </div>
 
 <div class="panel">
-    <h3><i class="icon-paint-brush"></i> {l s='Button Design' mod='neuralyn_tryon'}</h3>
-    <p>{l s='Customize the appearance of the TRYON button.' mod='neuralyn_tryon'}</p>
-
-    <form method="post" action="">
-        <div class="row">
-            <div class="col-lg-6">
-                <h4>{l s='Button Preview' mod='neuralyn_tryon'}</h4>
-                <div id="neuralyn-btn-preview" style="padding: 20px; background: #f5f5f5; border-radius: 4px; margin-bottom: 20px;">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Default:</label>
-                        <button type="button" class="neuralyn-tryon-app-button neuralyn-preview-btn" style="background-color: {$btn_bg_color|escape:'html':'UTF-8'}; color: {$btn_text_color|escape:'html':'UTF-8'};">
-                            {l s='Prove em você' mod='neuralyn_tryon'}
-                        </button>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Small:</label>
-                        <button type="button" class="neuralyn-tryon-app-button size-small neuralyn-preview-btn" style="background-color: {$btn_bg_color|escape:'html':'UTF-8'}; color: {$btn_text_color|escape:'html':'UTF-8'};">
-                            {l s='Prove em você' mod='neuralyn_tryon'}
-                        </button>
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Tiny:</label>
-                        <button type="button" class="neuralyn-tryon-app-button size-tiny neuralyn-preview-btn" style="background-color: {$btn_bg_color|escape:'html':'UTF-8'}; color: {$btn_text_color|escape:'html':'UTF-8'};">
-                            {l s='Prove em você' mod='neuralyn_tryon'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="form-group">
-                    <label>{l s='Enable Color Customization' mod='neuralyn_tryon'}</label>
-                    <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" name="btn_colors_enabled" id="btn_colors_enabled_on" value="1" {if $btn_colors_enabled}checked="checked"{/if} />
-                        <label for="btn_colors_enabled_on">{l s='Yes' mod='neuralyn_tryon'}</label>
-                        <input type="radio" name="btn_colors_enabled" id="btn_colors_enabled_off" value="0" {if !$btn_colors_enabled}checked="checked"{/if} />
-                        <label for="btn_colors_enabled_off">{l s='No' mod='neuralyn_tryon'}</label>
-                        <a class="slide-button btn"></a>
-                    </span>
-                </div>
-
-                <div id="color-pickers-container" {if !$btn_colors_enabled}style="display: none;"{/if}>
-                    <div class="form-group">
-                        <label for="btn_bg_color">{l s='Background Color' mod='neuralyn_tryon'}</label>
-                        <input type="color" name="btn_bg_color" id="btn_bg_color" value="{$btn_bg_color|escape:'html':'UTF-8'}" class="form-control" style="width: 80px; height: 40px; padding: 2px;" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="btn_text_color">{l s='Text Color' mod='neuralyn_tryon'}</label>
-                        <input type="color" name="btn_text_color" id="btn_text_color" value="{$btn_text_color|escape:'html':'UTF-8'}" class="form-control" style="width: 80px; height: 40px; padding: 2px;" />
-                    </div>
-                </div>
-
-                <div id="manual-css-notice" class="alert alert-warning" {if $btn_colors_enabled}style="display: none;"{/if}>
-                    <i class="icon-warning-sign"></i>
-                    <strong>{l s='Manual CSS required' mod='neuralyn_tryon'}</strong><br/>
-                    {l s='Color customization is disabled. To style the button, add CSS manually to your theme using the class:' mod='neuralyn_tryon'}
-                    <code>.neuralyn-tryon-app-button</code>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel-footer">
-            <button type="submit" name="submitNeuralynButtonDesign" class="btn btn-default pull-right">
-                <i class="process-icon-save"></i> {l s='Save Button Design' mod='neuralyn_tryon'}
-            </button>
-        </div>
-    </form>
-</div>
-
-<div class="panel">
     <h3><i class="icon-shopping-cart"></i> {l s='Buyer Order Statuses' mod='neuralyn_tryon'}</h3>
     <p>{l s='Select order statuses that qualify a customer as a "buyer". Customers with at least one order in any of these statuses will be considered buyers.' mod='neuralyn_tryon'}</p>
 
@@ -213,6 +202,39 @@
 </div>
 
 <style>
+.button-design-container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+.button-design-select {
+    flex: 0 0 300px;
+}
+.button-design-select label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.button-design-select select {
+    width: 100%;
+}
+.button-design-preview {
+    flex: 1;
+}
+.button-design-preview > label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+.preview-container {
+    padding: 30px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .order-statuses-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -238,75 +260,42 @@
     font-size: 14px;
     font-weight: 500;
 }
-.neuralyn-tryon-app-button {
-    padding: 12px 24px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-family: inherit;
-    text-decoration: none;
-    text-align: center;
-    line-height: 1.4;
-    border-radius: 4px;
-    transition: opacity 0.2s ease;
-}
-.neuralyn-tryon-app-button.size-small {
-    padding: 8px 16px;
-    font-size: 12px;
-}
-.neuralyn-tryon-app-button.size-tiny {
-    padding: 4px 10px;
-    font-size: 10px;
-}
 </style>
 
 <script type="text/javascript">
-(function() {
-    var bgColorInput = document.getElementById('btn_bg_color');
-    var textColorInput = document.getElementById('btn_text_color');
-    var previewButtons = document.querySelectorAll('.neuralyn-preview-btn');
-    var colorsEnabledOn = document.getElementById('btn_colors_enabled_on');
-    var colorsEnabledOff = document.getElementById('btn_colors_enabled_off');
-    var colorPickersContainer = document.getElementById('color-pickers-container');
-    var manualCssNotice = document.getElementById('manual-css-notice');
+function updateButtonPreview() {
+    var select = document.getElementById('button_style');
+    var preview = document.getElementById('button-preview');
+    var notice = document.getElementById('custom-style-notice');
+    var floatRightOn = document.getElementById('button_float_right_on');
+    var selectedStyle = select.value;
 
-    function updatePreviewColors() {
-        var bgColor = bgColorInput.value;
-        var textColor = textColorInput.value;
-        previewButtons.forEach(function(btn) {
-            btn.style.backgroundColor = bgColor;
-            btn.style.color = textColor;
-        });
-    }
+    // Remove todas as classes de estilo
+    var styles = ['animated', 'black', 'pink', 'dark-blue', 'light-blue', 'green', 'white', 'gray', 'red', 'orange', 'purple'];
+    styles.forEach(function(style) {
+        preview.classList.remove('neuralyn-tryon-' + style + '-button');
+    });
+    preview.classList.remove('is-visible');
 
-    function toggleColorOptions() {
-        var isEnabled = colorsEnabledOn.checked;
-        colorPickersContainer.style.display = isEnabled ? 'block' : 'none';
-        manualCssNotice.style.display = isEnabled ? 'none' : 'block';
-
-        if (!isEnabled) {
-            previewButtons.forEach(function(btn) {
-                btn.style.backgroundColor = '';
-                btn.style.color = '';
-            });
-        } else {
-            updatePreviewColors();
+    // Adiciona a classe do estilo selecionado (exceto custom)
+    if (selectedStyle !== 'custom') {
+        preview.classList.add('neuralyn-tryon-' + selectedStyle + '-button');
+        // Adiciona is-visible apenas para o botão animado
+        if (selectedStyle === 'animated') {
+            preview.classList.add('is-visible');
         }
     }
 
-    if (bgColorInput) {
-        bgColorInput.addEventListener('input', updatePreviewColors);
+    // Float right
+    if (floatRightOn && floatRightOn.checked) {
+        preview.classList.add('neuralyn-tryon-app-button-float-right');
+    } else {
+        preview.classList.remove('neuralyn-tryon-app-button-float-right');
     }
-    if (textColorInput) {
-        textColorInput.addEventListener('input', updatePreviewColors);
-    }
-    if (colorsEnabledOn) {
-        colorsEnabledOn.addEventListener('change', toggleColorOptions);
-    }
-    if (colorsEnabledOff) {
-        colorsEnabledOff.addEventListener('change', toggleColorOptions);
-    }
-})();
+
+    // Mostra/esconde aviso do custom
+    notice.style.display = selectedStyle === 'custom' ? 'block' : 'none';
+}
 </script>
 
 {if !$is_connected}

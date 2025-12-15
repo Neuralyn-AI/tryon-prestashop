@@ -93,8 +93,6 @@ class NeuralynTryonConnectModuleFrontController extends ModuleFrontController
     /**
      * Output JSON response and terminate.
      *
-     * @param array $data
-     *
      * @return void
      */
     protected function ajaxResponse(array $data)

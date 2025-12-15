@@ -47,7 +47,7 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
         parent::initContent();
 
         // Only accept POST requests
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if ('POST' !== $_SERVER['REQUEST_METHOD']) {
             $this->jsonResponse(false, 'METHOD_NOT_ALLOWED', $this->module->l('Method not allowed.', 'callback'), 405);
         }
 
@@ -138,7 +138,7 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
         // Log the response
         $logLevel = $success ? 1 : 3; // 1 = info, 3 = error
         PrestaShopLogger::addLog(
-            'Neuralyn TRYON callback response: ' . $jsonResponse,
+            'Neuralyn TRYON callback response: '.$jsonResponse,
             $logLevel,
             null,
             'NeuralynTryon'
@@ -151,8 +151,6 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
     /**
      * Send JSON success response with additional data.
      *
-     * @param array $data
-     *
      * @return void
      */
     protected function jsonResponseSuccess(array $data)
@@ -164,7 +162,7 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
         $jsonResponse = json_encode($response);
 
         PrestaShopLogger::addLog(
-            'Neuralyn TRYON callback response: ' . $jsonResponse,
+            'Neuralyn TRYON callback response: '.$jsonResponse,
             1, // info
             null,
             'NeuralynTryon'
