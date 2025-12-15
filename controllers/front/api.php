@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2025 Neuralyn.
  *
@@ -18,7 +19,6 @@
  * @copyright © 2025 Neuralyn
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -87,8 +87,8 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
 
         $customerId = (int) $data['customerId'];
         $customerUUID = (string) $data['customerUUID'];
-        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_'.$customerId;
-        $cacheKey = 'neuralyn_tryon_uuid_'.(int) $customerId;
+        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_' . $customerId;
+        $cacheKey = 'neuralyn_tryon_uuid_' . (int) $customerId;
 
         // Validate customerId is positive
         if ($customerId <= 0) {
@@ -114,7 +114,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         $result = Db::getInstance()->update(
             'customer',
             ['neuralyn_tryon_uuid' => pSQL($customerUUID)],
-            'id_customer = '.(int) $customerId
+            'id_customer = ' . (int) $customerId
         );
 
         if (!$result) {
@@ -159,7 +159,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         $sql = new DbQuery();
         $sql->select('id_webservice_account');
         $sql->from('webservice_account');
-        $sql->where('`key` = \''.pSQL($wsKey).'\'');
+        $sql->where('`key` = \'' . pSQL($wsKey) . '\'');
         $sql->where('active = 1');
 
         $result = Db::getInstance()->getValue($sql);
@@ -179,7 +179,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         $sql = new DbQuery();
         $sql->select('neuralyn_tryon_uuid');
         $sql->from('customer');
-        $sql->where('id_customer = '.(int) $customerId);
+        $sql->where('id_customer = ' . (int) $customerId);
 
         $result = Db::getInstance()->getValue($sql);
 
