@@ -8,8 +8,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required for creating releases
-      actions: read    # Required for workflow access
+      contents: write # Required for creating releases
+      actions: read # Required for workflow access
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,6 +53,7 @@ jobs:
           cp -r views neuralyn_tryon/
           cp -r translations neuralyn_tryon/
           cp neuralyn_tryon.php neuralyn_tryon/
+          cp .htaccess neuralyn_tryon/
           cp config.xml neuralyn_tryon/
           cp index.php neuralyn_tryon/
           cp logo.png neuralyn_tryon/

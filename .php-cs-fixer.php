@@ -1,5 +1,4 @@
 <?php
-
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude('vendor')
@@ -47,5 +46,7 @@ $finder = PhpCsFixer\Finder::create()
             'import_constants' => false,
             'import_functions' => false,
         ],
+        // Override Symfony rule to prevent blank lines after opening tag
+        'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder);
