@@ -18,6 +18,7 @@
  * @copyright © 2025 Neuralyn
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  */
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
