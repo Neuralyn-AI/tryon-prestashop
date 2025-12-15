@@ -71,7 +71,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         }
 
         // Only accept POST requests
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if ('POST' !== $_SERVER['REQUEST_METHOD']) {
             $this->jsonResponse(false, 'method_not_allowed', 'Method not allowed', 405);
         }
 
@@ -86,8 +86,8 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
 
         $customerId = (int) $data['customerId'];
         $customerUUID = (string) $data['customerUUID'];
-        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_' . $customerId;
-        $cacheKey = 'neuralyn_tryon_uuid_' . (int)$customerId;
+        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_'.$customerId;
+        $cacheKey = 'neuralyn_tryon_uuid_'.(int) $customerId;
 
         // Validate customerId is positive
         if ($customerId <= 0) {
@@ -113,7 +113,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         $result = Db::getInstance()->update(
             'customer',
             ['neuralyn_tryon_uuid' => pSQL($customerUUID)],
-            'id_customer = ' . (int) $customerId
+            'id_customer = '.(int) $customerId
         );
 
         if (!$result) {
@@ -121,7 +121,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         }
         ache::clean($negativeCacheKey);
         Cache::store($cacheKey, $customerUUID);
-        
+
         $this->jsonResponse(true, null, null, 200, $customerUUID);
     }
 
@@ -140,10 +140,10 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
             // Handle Authorization header directly (some servers don't populate PHP_AUTH_USER)
             $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-            if (strpos($authHeader, 'Basic ') === 0) {
+            if (str_starts_with($authHeader, 'Basic ')) {
                 $encoded = substr($authHeader, 6);
                 $decoded = base64_decode($encoded);
-                if ($decoded !== false) {
+                if (false !== $decoded) {
                     $parts = explode(':', $decoded, 2);
                     $wsKey = $parts[0];
                 }
@@ -158,7 +158,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         $sql = new DbQuery();
         $sql->select('id_webservice_account');
         $sql->from('webservice_account');
-        $sql->where('`key` = \'' . pSQL($wsKey) . '\'');
+        $sql->where('`key` = \''.pSQL($wsKey).'\'');
         $sql->where('active = 1');
 
         $result = Db::getInstance()->getValue($sql);
@@ -178,7 +178,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         $sql = new DbQuery();
         $sql->select('neuralyn_tryon_uuid');
         $sql->from('customer');
-        $sql->where('id_customer = ' . (int) $customerId);
+        $sql->where('id_customer = '.(int) $customerId);
 
         $result = Db::getInstance()->getValue($sql);
 
@@ -203,11 +203,11 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
 
         $response = ['status' => $status];
 
-        if ($status && $uuid !== null) {
+        if ($status && null !== $uuid) {
             $response['uuid'] = $uuid;
         }
 
-        if (!$status && $code !== null) {
+        if (!$status && null !== $code) {
             $response['code'] = $code;
             $response['message'] = $message;
         }
