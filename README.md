@@ -2,13 +2,31 @@
 
 A PrestaShop module that integrates the Neuralyn TRYON virtual try-on widget into your online store, allowing customers to virtually try on products before purchasing.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [How It Works](#how-it-works)
+- [Widget Integration](#widget-integration)
+- [Hook Configuration System](#hook-configuration-system)
+- [Button Design System](#button-design-system)
+- [API Access](#api-access)
+- [Features](#features)
+- [Architecture](#architecture)
+- [File Structure](#file-structure)
+- [Development](#development)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
 ## Overview
 
 The Neuralyn TRYON module connects your PrestaShop store to the Neuralyn TRYON SaaS platform, enabling virtual try-on capabilities for fashion and apparel products. This integration enhances the online shopping experience and helps reduce product return rates.
 
 ## Requirements
 
-- PrestaShop 1.6.0.0 or higher (compatible with 1.6, 1.7, and 8.0+)
+- PrestaShop 1.7 or higher (compatible with 1.7 and 8.0+)
 - PHP with cURL support (or `file_get_contents` enabled)
 - HTTPS/SSL enabled on your store
 - Active internet connection
@@ -50,40 +68,144 @@ The module operates as a bridge between your PrestaShop store and the Neuralyn c
 
 ### Widget Integration
 
-The module hooks into multiple PrestaShop display points to inject the try-on widget and button:
+The module hooks into multiple PrestaShop display points to inject the try-on widget and button. The system includes 19+ configurable hooks with flexible placement options:
 
-| Hook | Description | Location Options |
-|------|-------------|------------------|
-| `displayHeader` | Widget script injection (always enabled) | - |
-| `displayProductPriceBlock_after_price` | After product price | Product page / Listings / Both |
-| `displayProductPriceBlock_before_price` | Before product price | Product page / Listings / Both |
-| `displayProductPriceBlock_weight` | Near product weight | Product page / Listings / Both |
-| `displayAfterProductThumbs` | After product thumbnails | Product page only |
-| `displayReassurance` | In reassurance block | Product page only |
-| `displayProductAdditionalInfo` | Additional product info area | Product page only |
-| `displayProductExtraContent` | Extra content tabs | Product page only |
+#### Core Widget Injection
+| Hook | Description | Configurable |
+|------|-------------|--------------|
+| `displayHeader` | Widget script injection (always enabled) | No |
+| `displayBackOfficeHeader` | Admin CSS injection | No |
+| `displayFooterProduct` | Product page footer widget | No |
 
-The widget is loaded asynchronously from `https://cdn.neuralyn.com/widget.js` to ensure it doesn't affect page load performance.
+#### Product Page Hooks
+| Hook | Description | Location Options | Size Options |
+|------|-------------|------------------|--------------|
+| `displayReassurance` | Below breadcrumb, before main product area | Product page only | Default, Small, Tiny |
+| `displayProductCover` | Near product main image | Product page only | Default, Small, Tiny |
+| `displayAfterProductThumbs` | After product gallery thumbnails | Product page only | Default, Small, Tiny |
+| `displayProductThumbs` | Within product thumbnails area | Product page only | Default, Small, Tiny |
+| `displayProductVariants` | Near product variants/combinations | Product page only | Default, Small, Tiny |
+| `displayProductButtons` | In product buttons area | Product page only | Default, Small, Tiny |
+| `displayProductAdditionalInfo` | Below buttons (additional info area) | Product page only | Default, Small, Tiny |
+| `displayProductCustomizationForm` | Near customization options | Product page only | Default, Small, Tiny |
+| `displayProductExtraContent` | Creates new product tabs/content | Product page only | Default, Small, Tiny |
+| `displayProductPackContent` | For product packs | Product page only | Default, Small, Tiny |
 
-### Hook Configuration
+#### Price Block Hooks (Advanced Placement)
+| Hook | Description | Location Options | Size Options |
+|------|-------------|------------------|--------------|
+| `displayProductPriceBlock_after_price` | Immediately after final price | Product/Listings/Both | Default, Small, Tiny |
+| `displayProductPriceBlock_before_price` | Before any price appears | Product/Listings/Both | Default, Small, Tiny |
+| `displayProductPriceBlock_old_price` | Where crossed-out price shows (promotions) | Product/Listings/Both | Default, Small, Tiny |
+| `displayProductPriceBlock_unit_price` | Where unit price displays (per liter, etc.) | Product/Listings/Both | Default, Small, Tiny |
+| `displayProductPriceBlock_weight` | Where weight-based pricing shows | Product/Listings/Both | Default, Small, Tiny |
 
-In the module configuration, you can:
+#### Global Hooks
+| Hook | Description | Location Options | Size Options |
+|------|-------------|------------------|--------------|
+| `displayTop` | Top of page | All pages | Default, Small, Tiny |
+| `displayFooter` | Page footer | All pages | Default, Small, Tiny |
+| `displayProductPriceAndShipping` | Price and shipping area | Product/Listings/Both | Default, Small, Tiny |
 
-- **Enable/Disable hooks**: Control which hooks display the TRYON button
-- **Set location**: For price block hooks, choose where to display (product page only, listings only, or both)
-- **Set button size**: Choose button size per hook (Default, Small, or Tiny)
+### Hook Configuration System
 
-### Button Design
+The module provides comprehensive hook management through the admin panel:
 
-Customize the TRYON button appearance:
+#### Enable/Disable Control
+- **Individual Hook Control**: Toggle each hook on/off independently
+- **Bulk Operations**: Enable/disable multiple hooks at once
+- **Smart Defaults**: Common hooks enabled by default
 
-- **Enable Color Customization**: Toggle to enable custom colors
-  - When enabled: Set background and text colors via color pickers
-  - When disabled: Style the button manually via CSS using the `.neuralyn-tryon-app-button` class
-- **Button Sizes**: Three sizes available (default, small, tiny) with CSS classes:
-  - `.neuralyn-tryon-app-button` (default)
-  - `.neuralyn-tryon-app-button.size-small`
-  - `.neuralyn-tryon-app-button.size-tiny`
+#### Location Settings (Price Block Hooks)
+- **Product Page Only**: Button appears only on individual product pages
+- **Listings Only**: Button appears only in category/search listings
+- **Both**: Button appears in both contexts
+
+#### Size Configuration
+- **Default**: Standard button size (optimized for each hook position)
+- **Small**: Compact button for tight spaces
+- **Tiny**: Minimal button for subtle integration
+
+#### Real-time Preview
+- **Visual Preview**: See button appearance in admin panel
+- **Style Simulation**: Preview different configurations before applying
+
+### Button Design System
+
+The module includes a comprehensive button styling system with 12 predefined styles plus custom CSS support:
+
+#### Pre-built Button Styles
+| Style | Description | CSS Class | Usage |
+|-------|-------------|-----------|-------|
+| Animated | Interactive animated button with hover effects | `neuralyn-tryon-animated-button` | Default, engaging |
+| Black | Classic black button with white text | `neuralyn-tryon-black-button` | Professional, minimal |
+| Pink | Vibrant pink button | `neuralyn-tryon-pink-button` | Fashion, feminine brands |
+| Dark Blue | Deep blue button | `neuralyn-tryon-dark-blue-button` | Corporate, trustworthy |
+| Light Blue | Soft blue button | `neuralyn-tryon-light-blue-button` | Clean, modern |
+| Green | Green button | `neuralyn-tryon-green-button` | Natural, eco-friendly |
+| White | White button with dark text | `neuralyn-tryon-white-button` | Minimal, subtle |
+| Gray | Neutral gray button | `neuralyn-tryon-gray-button` | Understated, professional |
+| Red | Bold red button | `neuralyn-tryon-red-button` | Attention-grabbing |
+| Orange | Orange button | `neuralyn-tryon-orange-button` | Energetic, fun |
+| Purple | Purple button | `neuralyn-tryon-purple-button` | Luxury, creative |
+| Custom | Custom CSS styling | `neuralyn-tryon-app-button` | Full customization |
+
+#### Button Configuration Options
+
+**Style Selection**
+- Choose from 12 predefined styles
+- Real-time preview in admin panel
+- Switch between styles instantly
+
+**Float Position**
+- **Float Right**: Positions button on the right side of containers
+- **Default Position**: Button follows normal document flow
+- Applies to all enabled hooks
+
+**Size Options** (Per Hook)
+- **Default**: Optimized size for each hook position
+- **Small**: 80% of default size for compact areas
+- **Tiny**: 60% of default size for minimal integration
+
+#### Custom Styling
+
+For the **Custom** style option, use CSS to style the base button class:
+
+```css
+.neuralyn-tryon-app-button {
+    background: your-custom-color;
+    color: your-text-color;
+    border: your-border-style;
+    border-radius: your-border-radius;
+    padding: your-padding;
+    font-size: your-font-size;
+    /* Add any custom styles */
+}
+
+.neuralyn-tryon-app-button:hover {
+    /* Hover effects */
+}
+```
+
+#### Size Classes (Applied Automatically)
+
+```css
+/* Default size - no additional class needed */
+.neuralyn-tryon-app-button { }
+
+/* Small size */
+.neuralyn-tryon-app-button.neuralyn-tryon-small { }
+
+/* Tiny size */
+.neuralyn-tryon-app-button.neuralyn-tryon-tiny { }
+```
+
+#### Live Preview
+
+The admin configuration includes a live preview system:
+- **Real-time Updates**: See changes immediately
+- **Style Testing**: Preview all styles before applying
+- **Position Simulation**: See how float-right affects positioning
 
 ### API Access
 
@@ -273,6 +395,6 @@ This module is proprietary software. Each license is valid for a single PrestaSh
 
 ---
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Author**: Neuralyn
-**Compatibility**: PrestaShop 1.6.0.0+
+**Compatibility**: PrestaShop 1.7+

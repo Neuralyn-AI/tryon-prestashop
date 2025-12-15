@@ -120,7 +120,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         if (!$result) {
             $this->jsonResponse(false, 'internal_server_error', 'Failed to update customer UUID', 500);
         }
-        ache::clean($negativeCacheKey);
+        Cache::clean($negativeCacheKey);
         Cache::store($cacheKey, $customerUUID);
 
         $this->jsonResponse(true, null, null, 200, $customerUUID);
@@ -141,7 +141,7 @@ class NeuralynTryonApiModuleFrontController extends ModuleFrontController
         } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
             // Handle Authorization header directly (some servers don't populate PHP_AUTH_USER)
             $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-            if (str_starts_with($authHeader, 'Basic ')) {
+            if (strpos($authHeader, 'Basic ') === 0) {
                 $encoded = substr($authHeader, 6);
                 $decoded = base64_decode($encoded);
                 if (false !== $decoded) {

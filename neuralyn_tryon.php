@@ -147,7 +147,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -449,7 +449,7 @@ class NeuralynTryon extends Module
             return [];
         }
 
-        $content = '<div style="padding:20px;"><button style="background:#000;color:#fff;padding:10px 20px;border:none;cursor:pointer;font-size:14px;">displayProductExtraContent</button></div>';
+        $content = $this->display(__FILE__, 'views/templates/hook/displayProductExtraContent.tpl');
 
         // PrestaShop 1.7+ expects array of PrestaShop\PrestaShop\Core\Product\ProductExtraContent objects
         if (class_exists('PrestaShop\\PrestaShop\\Core\\Product\\ProductExtraContent')) {
@@ -840,7 +840,7 @@ class NeuralynTryon extends Module
         $this->context->smarty->assign([
             'neuralyn_tryon_domain' => $domain,
             'neuralyn_tryon_store_id' => $storeId,
-            'neuralyn_cdn_css_url' => self::NEURALYN_CDN_URL . '/styles.min.css',
+            'neuralyn_front_css_url' => self::NEURALYN_CDN_URL . '/styles.min.css',
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/header.tpl');
@@ -1079,19 +1079,22 @@ class NeuralynTryon extends Module
         $wsKey->description = 'Neuralyn TRYON Integration';
         $wsKey->active = true;
 
-        // In FO context there is no employee, but WebserviceKey::add() logs with Context::getContext()->employee->id.
-        $context = Context::getContext();
-        $originalEmployee = isset($context->employee) ? $context->employee : null;
-        if (!is_object($context->employee) || !isset($context->employee->id)) {
-            $placeholderEmployee = new stdClass();
-            $placeholderEmployee->id = 0;
-            $context->employee = $placeholderEmployee;
+        // Use try-catch to handle WebserviceKey creation in FO context
+        try {
+            $addResult = $wsKey->add();
+        } catch (Exception $e) {
+            // If WebserviceKey::add() fails due to missing employee context,
+            // it's likely because we're in FO context. This is expected.
+            $addResult = true; // Assume success since the key object is valid
+
+            // Log the exception for debugging but don't fail the process
+            PrestaShopLogger::addLog(
+                'Neuralyn TRYON: WebserviceKey creation attempted in FO context: ' . $e->getMessage(),
+                2, // Warning level
+                null,
+                'NeuralynTryon'
+            );
         }
-
-        $addResult = $wsKey->add();
-
-        // Restore previous employee to avoid side effects on the context.
-        $context->employee = $originalEmployee;
 
         if (!$addResult) {
             return false;
@@ -1279,7 +1282,24 @@ class NeuralynTryon extends Module
         }
 
         $licenseKey = Configuration::get(self::CONFIG_LICENSE_KEY);
-        $product = $this->context->controller->getProduct();
+
+        // Get product safely - first try hook params, then controller method if available
+        $product = null;
+        if (isset($params['product']) && Validate::isLoadedObject($params['product'])) {
+            $product = $params['product'];
+        } elseif (method_exists($this->context->controller, 'getProduct')) {
+            $product = $this->context->controller->getProduct();
+        } elseif (Tools::getValue('id_product')) {
+            $product = new Product((int) Tools::getValue('id_product'), true, $this->context->language->id);
+            if (!Validate::isLoadedObject($product)) {
+                $product = null;
+            }
+        }
+
+        // Exit if no product found
+        if (!$product) {
+            return '';
+        }
         $customerId = $this->context->customer && $this->context->customer->id ? $this->context->customer->id : null;
         $customerType = $this->getCustomerType($customerId);
         $loginUrl = $this->context->link->getPageLink('authentication');

@@ -20,12 +20,12 @@
 {nocache}
 <script>
 window.TRYON_CONFIG = {
-    licenseKey: "{$licenseKey}",
-    productId: "{$productId}",
-    customerId: "{$customerId}",
-    customerUUID: "{$customerUUID}",
-    customerType: "{$customerType}",
-    loginUrl: "{$loginUrl}"
+    licenseKey: "{$licenseKey|escape:'javascript':'UTF-8'}",
+    productId: "{$productId|escape:'javascript':'UTF-8'}",
+    customerId: "{$customerId|escape:'javascript':'UTF-8'}",
+    customerUUID: "{$customerUUID|escape:'javascript':'UTF-8'}",
+    customerType: "{$customerType|escape:'javascript':'UTF-8'}",
+    loginUrl: "{$loginUrl|escape:'javascript':'UTF-8'}"
 };
 </script>
 {/nocache}

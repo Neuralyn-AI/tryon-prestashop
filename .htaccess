@@ -1,0 +1,30 @@
+# Security: Prevent directory listing and file access
+Options -Indexes
+
+# Deny access to sensitive files
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.sql">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "config*.xml">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to common backup and temporary files
+<FilesMatch "\.(bak|backup|old|tmp|temp|swp|~)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent access to hidden files (except .htaccess itself)
+<FilesMatch "^\.(?!htaccess)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
