@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
 
 NeuralynTryon::registerAlias();
 
-class neuralyn_tryon extends Module
+class NeuralynTryon extends Module
 {
     public $cached = false;
 
