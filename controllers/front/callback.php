@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2025 Neuralyn.
  *
@@ -18,7 +19,6 @@
  * @copyright © 2025 Neuralyn
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -139,7 +139,7 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
         // Log the response
         $logLevel = $success ? 1 : 3; // 1 = info, 3 = error
         PrestaShopLogger::addLog(
-            'Neuralyn TRYON callback response: '.$jsonResponse,
+            'Neuralyn TRYON callback response: ' . $jsonResponse,
             $logLevel,
             null,
             'NeuralynTryon'
@@ -163,7 +163,7 @@ class NeuralynTryonCallbackModuleFrontController extends ModuleFrontController
         $jsonResponse = json_encode($response);
 
         PrestaShopLogger::addLog(
-            'Neuralyn TRYON callback response: '.$jsonResponse,
+            'Neuralyn TRYON callback response: ' . $jsonResponse,
             1, // info
             null,
             'NeuralynTryon'

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2025 Neuralyn.
  *
@@ -18,7 +19,6 @@
  * @copyright © 2025 Neuralyn
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -156,7 +156,7 @@ class NeuralynTryon extends Module
         parent::__construct();
 
         // Initialize secure_key for AJAX validation
-        $this->secure_key = md5($this->name._COOKIE_KEY_);
+        $this->secure_key = md5($this->name . _COOKIE_KEY_);
 
         $this->displayName = $this->l('Neuralyn TRYON Integration');
         $this->description = $this->l('Connect your store to Neuralyn TRYON SaaS platform and enable the Neuralyn widget.');
@@ -186,10 +186,10 @@ class NeuralynTryon extends Module
         $this->registerHook('displayFooterProduct');
 
         // Add UUID field to customers table, if not exists
-        $columns = Db::getInstance()->executeS('SHOW COLUMNS FROM `'._DB_PREFIX_.'customer` LIKE "neuralyn_tryon_uuid"');
+        $columns = Db::getInstance()->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'customer` LIKE "neuralyn_tryon_uuid"');
 
         if (!$columns) {
-            $sql = 'ALTER TABLE `'._DB_PREFIX_.'customer`
+            $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'customer`
                     ADD `neuralyn_tryon_uuid` VARCHAR(255) NULL';
             if (!Db::getInstance()->execute($sql)) {
                 return false;
@@ -282,8 +282,8 @@ class NeuralynTryon extends Module
     public function hookDisplayBackOfficeHeader()
     {
         if ($this->context->controller) {
-            $this->context->controller->addCSS($this->_path.'views/css/admin.css');
-            $this->context->controller->addCSS(self::NEURALYN_CDN_URL.'/styles.min.css');
+            $this->context->controller->addCSS($this->_path . 'views/css/admin.css');
+            $this->context->controller->addCSS(self::NEURALYN_CDN_URL . '/styles.min.css');
         }
     }
 
@@ -375,7 +375,7 @@ class NeuralynTryon extends Module
     public function hookDisplayProductPriceBlock($params)
     {
         $type = isset($params['type']) ? $params['type'] : '';
-        $hookKey = 'displayProductPriceBlock_'.$type;
+        $hookKey = 'displayProductPriceBlock_' . $type;
 
         if (!isset(self::$availableHooks[$hookKey])) {
             return '';
@@ -840,7 +840,7 @@ class NeuralynTryon extends Module
         $this->context->smarty->assign([
             'neuralyn_tryon_domain' => $domain,
             'neuralyn_tryon_store_id' => $storeId,
-            'neuralyn_cdn_css_url' => self::NEURALYN_CDN_URL.'/styles.min.css',
+            'neuralyn_cdn_css_url' => self::NEURALYN_CDN_URL . '/styles.min.css',
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/header.tpl');
@@ -857,7 +857,7 @@ class NeuralynTryon extends Module
         if (Tools::isSubmit('submitNeuralynHooks')) {
             $enabledHooks = [];
             foreach (array_keys(self::$availableHooks) as $hookName) {
-                if ('1' === Tools::getValue('hook_'.$hookName)) {
+                if ('1' === Tools::getValue('hook_' . $hookName)) {
                     $enabledHooks[] = $hookName;
                 }
             }
@@ -866,7 +866,7 @@ class NeuralynTryon extends Module
             // Save hook locations
             $hookLocations = [];
             foreach (self::$hooksWithLocationOption as $hookName) {
-                $location = Tools::getValue('hook_location_'.$hookName, self::LOCATION_PRODUCT);
+                $location = Tools::getValue('hook_location_' . $hookName, self::LOCATION_PRODUCT);
                 if (in_array($location, [self::LOCATION_PRODUCT, self::LOCATION_LISTING, self::LOCATION_BOTH])) {
                     $hookLocations[$hookName] = $location;
                 }
@@ -876,7 +876,7 @@ class NeuralynTryon extends Module
             // Save hook sizes
             $hookSizes = [];
             foreach (array_keys(self::$availableHooks) as $hookName) {
-                $size = Tools::getValue('hook_size_'.$hookName, self::SIZE_DEFAULT);
+                $size = Tools::getValue('hook_size_' . $hookName, self::SIZE_DEFAULT);
                 if (in_array($size, [self::SIZE_DEFAULT, self::SIZE_SMALL, self::SIZE_TINY])) {
                     $hookSizes[$hookName] = $size;
                 }
@@ -918,7 +918,7 @@ class NeuralynTryon extends Module
 
         $isConnected = $this->isConnected();
         $licenseKey = Configuration::get(self::CONFIG_LICENSE_KEY);
-        $manageUrl = self::NEURALYN_CONNECT_WEB_BASE_URL.'/tryon/manage/?licenseKey='.urlencode($licenseKey);
+        $manageUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/tryon/manage/?licenseKey=' . urlencode($licenseKey);
 
         // Prepare hooks configuration data
         $enabledHooks = $this->getEnabledHooks();
@@ -1051,7 +1051,7 @@ class NeuralynTryon extends Module
         $domain = preg_replace('#^https?://#', '', $domain);
         $domain = rtrim($domain, '/');
 
-        $redirectUrl = self::NEURALYN_CONNECT_WEB_BASE_URL.'/connect/tryon?'.http_build_query([
+        $redirectUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/connect/tryon?' . http_build_query([
             'connectionId' => $connectionId,
             'domain' => $domain,
             'service_token' => 'tryon',
@@ -1146,7 +1146,7 @@ class NeuralynTryon extends Module
      */
     public function getWebserviceBaseUrl()
     {
-        return Tools::getShopDomainSsl(true).__PS_BASE_URI__.'api/';
+        return Tools::getShopDomainSsl(true) . __PS_BASE_URI__ . 'api/';
     }
 
     /**
@@ -1189,7 +1189,7 @@ class NeuralynTryon extends Module
         }
 
         if (false === $response || $status >= 400) {
-            PrestaShopLogger::addLog('Neuralyn TRYON API call failed: '.$error.' status:'.$status, 3, null, 'Neuralyn TRYON');
+            PrestaShopLogger::addLog('Neuralyn TRYON API call failed: ' . $error . ' status:' . $status, 3, null, 'Neuralyn TRYON');
 
             return ['success' => false, 'status' => $status, 'error' => $error, 'response' => $response];
         }
@@ -1199,8 +1199,8 @@ class NeuralynTryon extends Module
 
     private function getCustomerUUID($customerId)
     {
-        $cacheKey = 'neuralyn_tryon_uuid_'.(int) $customerId;
-        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_'.(int) $customerId;
+        $cacheKey = 'neuralyn_tryon_uuid_' . (int) $customerId;
+        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_' . (int) $customerId;
 
         // Look for UUID in the cache
         if (Cache::isStored($cacheKey)) {
@@ -1215,8 +1215,8 @@ class NeuralynTryon extends Module
         $uuid = Db::getInstance()->getValue(
             '
             SELECT neuralyn_tryon_uuid
-            FROM '._DB_PREFIX_.'customer
-            WHERE id_customer = '.(int) $customerId
+            FROM ' . _DB_PREFIX_ . 'customer
+            WHERE id_customer = ' . (int) $customerId
         );
 
         if ($uuid) {
@@ -1243,7 +1243,7 @@ class NeuralynTryon extends Module
             return 'guest';
         }
 
-        $cacheKey = 'neuralyn_tryon_customer_type_'.(int) $customerId;
+        $cacheKey = 'neuralyn_tryon_customer_type_' . (int) $customerId;
 
         if (Cache::isStored($cacheKey)) {
             return Cache::retrieve($cacheKey);
@@ -1256,9 +1256,9 @@ class NeuralynTryon extends Module
             $statusesIn = implode(',', array_map('intval', $buyerStatuses));
 
             $hasBuyerOrder = Db::getInstance()->getValue('
-                SELECT 1 FROM '._DB_PREFIX_.'orders
-                WHERE id_customer = '.(int) $customerId.'
-                AND current_state IN ('.$statusesIn.')
+                SELECT 1 FROM ' . _DB_PREFIX_ . 'orders
+                WHERE id_customer = ' . (int) $customerId . '
+                AND current_state IN (' . $statusesIn . ')
                 LIMIT 1
             ');
 
