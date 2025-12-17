@@ -9,3 +9,7 @@
     font-size: 20px;
     margin-bottom: 10px;
 }
+
+.neuralyn-tryon-app-button {
+    display: inline-flex !important;
+}
