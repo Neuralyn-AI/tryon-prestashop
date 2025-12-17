@@ -120,7 +120,6 @@
                     <th style="width: 250px;">{l s='Hook Name' mod='neuralyn_tryon'}</th>
                     <th>{l s='Description' mod='neuralyn_tryon'}</th>
                     <th style="width: 160px;">{l s='Location' mod='neuralyn_tryon'}</th>
-                    <th style="width: 100px;">{l s='Size' mod='neuralyn_tryon'}</th>
                 </tr>
             </thead>
             <tbody>
@@ -151,13 +150,6 @@
                         {else}
                             <span class="text-muted">-</span>
                         {/if}
-                    </td>
-                    <td>
-                        <select name="hook_size_{$hook.name|escape:'html':'UTF-8'}" class="form-control">
-                            <option value="{$size_default|escape:'html':'UTF-8'}" {if $hook.size == $size_default}selected="selected"{/if}>{l s='Default' mod='neuralyn_tryon'}</option>
-                            <option value="{$size_small|escape:'html':'UTF-8'}" {if $hook.size == $size_small}selected="selected"{/if}>{l s='Small' mod='neuralyn_tryon'}</option>
-                            <option value="{$size_tiny|escape:'html':'UTF-8'}" {if $hook.size == $size_tiny}selected="selected"{/if}>{l s='Tiny' mod='neuralyn_tryon'}</option>
-                        </select>
                     </td>
                 </tr>
                 {/foreach}
@@ -270,17 +262,17 @@ function updateButtonPreview() {
     var floatRightOn = document.getElementById('button_float_right_on');
     var selectedStyle = select.value;
 
-    // Remove todas as classes de estilo
+    // Removes all style classes
     var styles = ['animated', 'black', 'pink', 'dark-blue', 'light-blue', 'green', 'white', 'gray', 'red', 'orange', 'purple'];
     styles.forEach(function(style) {
         preview.classList.remove('neuralyn-tryon-' + style + '-button');
     });
     preview.classList.remove('is-visible');
 
-    // Adiciona a classe do estilo selecionado (exceto custom)
+    // Add class to the selected style (except custom)
     if (selectedStyle !== 'custom') {
         preview.classList.add('neuralyn-tryon-' + selectedStyle + '-button');
-        // Adiciona is-visible apenas para o botão animado
+        // Add is-visible for the animated button only
         if (selectedStyle === 'animated') {
             preview.classList.add('is-visible');
         }
@@ -293,7 +285,7 @@ function updateButtonPreview() {
         preview.classList.remove('neuralyn-tryon-app-button-float-right');
     }
 
-    // Mostra/esconde aviso do custom
+    // show/hide message regarding custom styles
     notice.style.display = selectedStyle === 'custom' ? 'block' : 'none';
 }
 </script>

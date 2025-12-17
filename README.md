@@ -284,7 +284,7 @@ Authorization: Basic <base64(webservice_key:)>
 
 {
   "customerId": 123,
-  "customerUUID": "uuid-string-here"
+  "uuid": "uuid-string-here"
 }
 ```
 

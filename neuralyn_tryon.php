@@ -34,22 +34,17 @@ class NeuralynTryon extends Module
     public const CONFIG_CONNECTION_ID_EXPIRE = 'NEURALYN_TRYON_CONNECTION_ID_EXPIRE';
     public const CONFIG_HOOKS_ENABLED = 'NEURALYN_TRYON_HOOKS_ENABLED';
     public const CONFIG_HOOKS_LOCATION = 'NEURALYN_TRYON_HOOKS_LOCATION';
-    public const CONFIG_HOOKS_SIZE = 'NEURALYN_TRYON_HOOKS_SIZE';
     public const CONFIG_BUTTON_STYLE = 'NEURALYN_TRYON_BTN_STYLE';
     public const CONFIG_BUTTON_FLOAT_RIGHT = 'NEURALYN_TRYON_BTN_FLOAT_RIGHT';
     public const CONFIG_BUYER_ORDER_STATUSES = 'NEURALYN_TRYON_BUYER_ORDER_STATUSES';
     public const CONFIG_API_BASE_URL = 'NEURALYN_TRYON_API_BASE_URL';
     public const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
-    public const NEURALYN_CONNECT_WEB_BASE_URL = 'http://127.0.0.1:7171';
-    public const NEURALYN_CDN_URL = 'http://localhost:5173';
+    public const NEURALYN_CONNECT_WEB_BASE_URL = 'https://www.neuralyn.com.br';
+    public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
 
     public const LOCATION_PRODUCT = 'product';
     public const LOCATION_LISTING = 'listing';
     public const LOCATION_BOTH = 'both';
-
-    public const SIZE_DEFAULT = 'default';
-    public const SIZE_SMALL = 'small';
-    public const SIZE_TINY = 'tiny';
 
     public const STYLE_ANIMATED = 'animated';
     public const STYLE_BLACK = 'black';
@@ -146,7 +141,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -201,8 +196,8 @@ class NeuralynTryon extends Module
             }
         }
 
-        // Enable all hooks by default
-        $defaultEnabledHooks = array_keys(self::$availableHooks);
+        // Enable only displayProductPriceBlock_after_price by default
+        $defaultEnabledHooks = ['displayProductPriceBlock_after_price'];
         Configuration::updateValue(self::CONFIG_HOOKS_ENABLED, json_encode($defaultEnabledHooks));
 
         // Set default location for hooks with location option
@@ -211,13 +206,6 @@ class NeuralynTryon extends Module
             $defaultLocations[$hookName] = self::LOCATION_PRODUCT;
         }
         Configuration::updateValue(self::CONFIG_HOOKS_LOCATION, json_encode($defaultLocations));
-
-        // Set default sizes for all hooks
-        $defaultSizes = [];
-        foreach (array_keys(self::$availableHooks) as $hookName) {
-            $defaultSizes[$hookName] = self::SIZE_DEFAULT;
-        }
-        Configuration::updateValue(self::CONFIG_HOOKS_SIZE, json_encode($defaultSizes));
 
         // Set default button style
         Configuration::updateValue(self::CONFIG_BUTTON_STYLE, self::STYLE_ANIMATED);
@@ -261,7 +249,6 @@ class NeuralynTryon extends Module
         Configuration::deleteByName(self::CONFIG_CONNECTION_ID_EXPIRE);
         Configuration::deleteByName(self::CONFIG_HOOKS_ENABLED);
         Configuration::deleteByName(self::CONFIG_HOOKS_LOCATION);
-        Configuration::deleteByName(self::CONFIG_HOOKS_SIZE);
         Configuration::deleteByName(self::CONFIG_BUTTON_STYLE);
         Configuration::deleteByName(self::CONFIG_BUTTON_FLOAT_RIGHT);
         Configuration::deleteByName(self::CONFIG_BUYER_ORDER_STATUSES);
@@ -570,52 +557,6 @@ class NeuralynTryon extends Module
     }
 
     /**
-     * Get hook sizes configuration.
-     *
-     * @return array
-     */
-    public function getHookSizes()
-    {
-        $sizes = Configuration::get(self::CONFIG_HOOKS_SIZE);
-        if (empty($sizes)) {
-            $default = [];
-            foreach (array_keys(self::$availableHooks) as $hookName) {
-                $default[$hookName] = self::SIZE_DEFAULT;
-            }
-
-            return $default;
-        }
-
-        $decoded = json_decode($sizes, true);
-
-        return is_array($decoded) ? $decoded : [];
-    }
-
-    /**
-     * Get size for a specific hook.
-     *
-     * @param string $hookName
-     *
-     * @return string
-     */
-    public function getHookSize($hookName)
-    {
-        $sizes = $this->getHookSizes();
-
-        return isset($sizes[$hookName]) ? $sizes[$hookName] : self::SIZE_DEFAULT;
-    }
-
-    /**
-     * Save hook sizes configuration.
-     *
-     * @return bool
-     */
-    public function saveHookSizes(array $sizes)
-    {
-        return Configuration::updateValue(self::CONFIG_HOOKS_SIZE, json_encode($sizes));
-    }
-
-    /**
      * Get button style configuration.
      *
      * @return string
@@ -808,12 +749,10 @@ class NeuralynTryon extends Module
             return '';
         }
 
-        $size = $this->getHookSize($hookName);
         $buttonStyle = $this->getButtonStyle();
 
         $this->context->smarty->assign([
             'neuralyn_hook_name' => $hookName,
-            'neuralyn_button_size' => $size,
             'neuralyn_button_style' => $buttonStyle,
             'neuralyn_button_float_right' => $this->getButtonFloatRight(),
         ]);
@@ -872,16 +811,6 @@ class NeuralynTryon extends Module
             }
             $this->saveHookLocations($hookLocations);
 
-            // Save hook sizes
-            $hookSizes = [];
-            foreach (array_keys(self::$availableHooks) as $hookName) {
-                $size = Tools::getValue('hook_size_' . $hookName, self::SIZE_DEFAULT);
-                if (in_array($size, [self::SIZE_DEFAULT, self::SIZE_SMALL, self::SIZE_TINY])) {
-                    $hookSizes[$hookName] = $size;
-                }
-            }
-            $this->saveHookSizes($hookSizes);
-
             $output .= $this->displayConfirmation($this->l('Hook settings have been saved.'));
         }
 
@@ -922,7 +851,6 @@ class NeuralynTryon extends Module
         // Prepare hooks configuration data
         $enabledHooks = $this->getEnabledHooks();
         $hookLocations = $this->getHookLocations();
-        $hookSizes = $this->getHookSizes();
         $hooksConfig = [];
         foreach (self::$availableHooks as $hookName => $description) {
             $hooksConfig[] = [
@@ -931,7 +859,6 @@ class NeuralynTryon extends Module
                 'enabled' => in_array($hookName, $enabledHooks),
                 'has_location_option' => in_array($hookName, self::$hooksWithLocationOption),
                 'location' => isset($hookLocations[$hookName]) ? $hookLocations[$hookName] : self::LOCATION_PRODUCT,
-                'size' => isset($hookSizes[$hookName]) ? $hookSizes[$hookName] : self::SIZE_DEFAULT,
             ];
         }
 
@@ -954,9 +881,6 @@ class NeuralynTryon extends Module
             'location_product' => self::LOCATION_PRODUCT,
             'location_listing' => self::LOCATION_LISTING,
             'location_both' => self::LOCATION_BOTH,
-            'size_default' => self::SIZE_DEFAULT,
-            'size_small' => self::SIZE_SMALL,
-            'size_tiny' => self::SIZE_TINY,
             'button_styles' => self::$buttonStyles,
             'current_button_style' => $currentButtonStyle,
             'button_float_right' => $this->getButtonFloatRight(),
