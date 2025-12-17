@@ -49,11 +49,17 @@ jobs:
         run: |
           sed -i "s/\$this->version = '[^']*'/\$this->version = '${{ steps.new.outputs.version }}'/" neuralyn_tryon.php
 
+      - name: Update README.md download links and badges
+        run: |
+          sed -i "s|/releases/download/v[^/]*/neuralyn_tryon.zip|/releases/download/v${{ steps.new.outputs.version }}/neuralyn_tryon.zip|g" README.md
+          sed -i "s|version-[0-9.]*-blue|version-${{ steps.new.outputs.version }}-blue|g" README.md
+          sed -i "s|versão-[0-9.]*-blue|versão-${{ steps.new.outputs.version }}-blue|g" README.md
+
       - name: Commit and push branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add config.xml neuralyn_tryon.php
+          git add config.xml neuralyn_tryon.php README.md
           git commit -m "Bump version to ${{ steps.new.outputs.version }}"
           git push -u origin bump/v${{ steps.new.outputs.version }}
 
@@ -70,6 +76,7 @@ jobs:
           ### Files changed:
           - \`config.xml\`
           - \`neuralyn_tryon.php\`
+          - \`README.md\` (download links and version badges)
 
           ### What happens next:
           When this PR is merged, a new release **v${{ steps.new.outputs.version }}** will be created automatically with the module zip attached.
