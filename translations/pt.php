@@ -29,3 +29,17 @@ $_MODULE['<{neuralyn_tryon}prestashop>configure_a7461c6a1a35367206e159a3f0495a8b
 
 // Front connect template (connect.tpl)
 $_MODULE['<{neuralyn_tryon}prestashop>connect_923d90d3d5f827cfd6f5aa58b9b609d7'] = 'Este endpoint e usado para a integracao do Neuralyn TRYON. Por favor, retorne ao painel administrativo para iniciar uma conexao.';
+
+// Button styles
+$_MODULE['<{neuralyn_tryon}prestashop>configure_0a21b95b6f230fe4bfc1db9aa2defad9'] = 'Animado';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_e90dfb84e30edf611e326eeb04d680de'] = 'Preto';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_8dc5344bc0746e1cc5abf896ca03bbdf'] = 'Rosa';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_6c26a60562ea280b323bccb9587e7bef'] = 'Azul escuro';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_9811296a6741e1e66932397780fff100'] = 'Azul claro';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_d382816a3cbeed082c9e216e7392eed1'] = 'Verde';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_25a81701fbfa4a1efdf660a950c1d006'] = 'Branco';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_994ae1d9731cebe455aff211bcb25b93'] = 'Cinza';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_ee38e4d5dd68c4e440825018d549cb47'] = 'Vermelho';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_909cea0c97058cfe2e3ea8d675cb08e1'] = 'Laranja';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_b9ba865fec061c9706d2fd7ce49c0cc7'] = 'Roxo';
+$_MODULE['<{neuralyn_tryon}prestashop>configure_90589c47f06eb971d548591f23c285af'] = 'Personalizado';

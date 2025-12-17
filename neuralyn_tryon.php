@@ -65,18 +65,18 @@ class NeuralynTryon extends Module
      * @var array<string, string>
      */
     public static $buttonStyles = [
-        'animated' => 'Animado',
-        'black' => 'Preto',
-        'pink' => 'Rosa',
-        'dark-blue' => 'Azul escuro',
-        'light-blue' => 'Azul claro',
-        'green' => 'Verde',
-        'white' => 'Branco',
-        'gray' => 'Cinza',
-        'red' => 'Vermelho',
-        'orange' => 'Laranja',
-        'purple' => 'Roxo',
-        'custom' => 'Personalizado',
+        'animated' => 'Animated',
+        'black' => 'Black',
+        'pink' => 'Pink',
+        'dark-blue' => 'Dark blue',
+        'light-blue' => 'Light blue',
+        'green' => 'Green',
+        'white' => 'White',
+        'gray' => 'Gray',
+        'red' => 'Red',
+        'orange' => 'Orange',
+        'purple' => 'Purple',
+        'custom' => 'Custom',
     ];
 
     /**

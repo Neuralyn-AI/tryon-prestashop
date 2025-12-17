@@ -59,7 +59,7 @@
                 <select name="button_style" id="button_style" class="form-control" onchange="updateButtonPreview()">
                     {foreach from=$button_styles key=style_key item=style_label}
                     <option value="{$style_key|escape:'html':'UTF-8'}" {if $current_button_style == $style_key}selected="selected"{/if}>
-                        {$style_label|escape:'html':'UTF-8'}
+                        {l s=$style_label mod='neuralyn_tryon'}
                     </option>
                     {/foreach}
                 </select>
