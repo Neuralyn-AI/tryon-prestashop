@@ -1,4 +1,4 @@
-# Neuralyn TRYON - Virtual Try-On for PrestaShop
+# Neuralyn TRYON - Virtual Fittng Room for PrestaShop
 
 [![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)](https://github.com/Neuralyn-AI/tryon-prestashop/releases)
 [![PrestaShop](https://img.shields.io/badge/PrestaShop-1.7%2B-pink.svg)](https://www.prestashop.com/)
