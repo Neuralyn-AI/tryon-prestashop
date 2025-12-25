@@ -23,9 +23,12 @@ window.TRYON_CONFIG = {
     licenseKey: "{$licenseKey|escape:'javascript':'UTF-8'}",
     productId: "{$productId|escape:'javascript':'UTF-8'}",
     customerId: "{$customerId|escape:'javascript':'UTF-8'}",
-    uuid: "{$customerUUID|escape:'javascript':'UTF-8'}",
+    customerUUID: "{$customerUUID|escape:'javascript':'UTF-8'}",
     customerType: "{$customerType|escape:'javascript':'UTF-8'}",
-    loginUrl: "{$loginUrl|escape:'javascript':'UTF-8'}"
+    loginUrl: "{$loginUrl|escape:'javascript':'UTF-8'}",
+    platform: "prestashop"{if $customerId},
+    staticToken: "{$staticToken|escape:'javascript':'UTF-8'}",
+    photos: {$customerPhotos|json_encode}{/if}
 };
 </script>
 {/nocache}

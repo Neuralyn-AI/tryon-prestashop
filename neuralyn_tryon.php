@@ -190,6 +190,17 @@ class NeuralynTryon extends Module
             }
         }
 
+        // Add images field to customers table, if not exists
+        $imagesColumn = Db::getInstance()->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'customer` LIKE "neuralyn_tryon_images"');
+
+        if (!$imagesColumn) {
+            $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'customer`
+                    ADD `neuralyn_tryon_photos` JSON NULL';
+            if (!Db::getInstance()->execute($sql)) {
+                return false;
+            }
+        }
+
         foreach ($this->hooks as $hook) {
             if (!$this->registerHook($hook)) {
                 return false;
@@ -1126,15 +1137,10 @@ class NeuralynTryon extends Module
     private function getCustomerUUID($customerId)
     {
         $cacheKey = 'neuralyn_tryon_uuid_' . (int) $customerId;
-        $negativeCacheKey = 'neuralyn_tryon_uuid_missing_' . (int) $customerId;
 
         // Look for UUID in the cache
         if (Cache::isStored($cacheKey)) {
             return Cache::retrieve($cacheKey);
-        }
-
-        if (Cache::isStored($negativeCacheKey)) {
-            return false;
         }
 
         // If it is not in cache, get from DB
@@ -1145,14 +1151,76 @@ class NeuralynTryon extends Module
             WHERE id_customer = ' . (int) $customerId
         );
 
-        if ($uuid) {
-            // Stores for 30 minutes
-            Cache::store($cacheKey, $uuid);
-        } else {
-            Cache::store($negativeCacheKey, '1');
+        if (!$uuid) {
+            // Generate new UUID v4 and save to DB
+            $uuid = $this->generateUuidV4();
+
+            Db::getInstance()->update(
+                'customer',
+                ['neuralyn_tryon_uuid' => pSQL($uuid)],
+                'id_customer = ' . (int) $customerId
+            );
         }
 
+        Cache::store($cacheKey, $uuid);
+
         return $uuid;
+    }
+
+    /**
+     * Generate a UUID v4.
+     *
+     * @return string
+     */
+    private function generateUuidV4()
+    {
+        $data = random_bytes(16);
+
+        // Set version to 0100 (UUID v4)
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+        // Set bits 6-7 to 10 (UUID variant)
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    /**
+     * Get customer photos from cache or database.
+     *
+     * @param int $customerId
+     *
+     * @return array Associative array [productId => uuid]
+     */
+    private function getCustomerPhotos($customerId)
+    {
+        $cacheKey = 'neuralyn_tryon_photos_' . (int) $customerId;
+
+        // Try cache first
+        if (Cache::isStored($cacheKey)) {
+            $cached = Cache::retrieve($cacheKey);
+            if (is_array($cached)) {
+                return $cached;
+            }
+        }
+
+        // Get from database
+        $result = Db::getInstance()->getValue(
+            'SELECT neuralyn_tryon_photos
+            FROM ' . _DB_PREFIX_ . 'customer
+            WHERE id_customer = ' . (int) $customerId
+        );
+
+        if (empty($result)) {
+            $photos = [];
+        } else {
+            $decoded = json_decode($result, true);
+            $photos = is_array($decoded) ? $decoded : [];
+        }
+
+        // Store in cache
+        Cache::store($cacheKey, $photos);
+
+        return $photos;
     }
 
     /**
@@ -1185,7 +1253,6 @@ class NeuralynTryon extends Module
                 SELECT 1 FROM ' . _DB_PREFIX_ . 'orders
                 WHERE id_customer = ' . (int) $customerId . '
                 AND current_state IN (' . $statusesIn . ')
-                LIMIT 1
             ');
 
             if ($hasBuyerOrder) {
@@ -1227,6 +1294,7 @@ class NeuralynTryon extends Module
         $customerType = $this->getCustomerType($customerId);
         $loginUrl = $this->context->link->getPageLink('authentication');
         $customerUUID = $customerId ? $this->getCustomerUUID($customerId) : '';
+        $customerPhotos = $customerId ? $this->getCustomerPhotos($customerId) : [];
 
         $this->context->smarty->assign([
             'licenseKey' => pSQL($licenseKey),
@@ -1235,7 +1303,9 @@ class NeuralynTryon extends Module
             'customerId' => $customerId,
             'customerType' => $customerType,
             'customerUUID' => $customerUUID,
+            'customerPhotos' => $customerPhotos,
             'loginUrl' => $loginUrl,
+            'staticToken' => $customerId ? Tools::getToken(false) : '',
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/widget.tpl');
