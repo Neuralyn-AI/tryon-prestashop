@@ -141,7 +141,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -191,7 +191,7 @@ class NeuralynTryon extends Module
         }
 
         // Add images field to customers table, if not exists
-        $imagesColumn = Db::getInstance()->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'customer` LIKE "neuralyn_tryon_images"');
+        $imagesColumn = Db::getInstance()->executeS('SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'customer` LIKE "neuralyn_tryon_photos"');
 
         if (!$imagesColumn) {
             $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'customer`
@@ -800,6 +800,13 @@ class NeuralynTryon extends Module
      */
     public function getContent()
     {
+        // Ensure all hooks are registered (for upgrades)
+        foreach ($this->hooks as $hook) {
+            if (!$this->isRegisteredInHook($hook)) {
+                $this->registerHook($hook);
+            }
+        }
+
         $output = '';
 
         // Handle hooks form submission

@@ -1,9 +1,9 @@
 # Neuralyn TRYON - Virtual Fittng Room for PrestaShop
 
-[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)](https://github.com/Neuralyn-AI/tryon-prestashop/releases)
+[![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)](https://github.com/Neuralyn-AI/tryon-prestashop/releases)
 [![PrestaShop](https://img.shields.io/badge/PrestaShop-1.7%2B-pink.svg)](https://www.prestashop.com/)
 
-[![Download Latest Version](https://img.shields.io/badge/Download-neuralyn__tryon.zip-green?style=for-the-badge&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.3/neuralyn_tryon.zip)
+[![Download Latest Version](https://img.shields.io/badge/Download-neuralyn__tryon.zip-green?style=for-the-badge&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.4/neuralyn_tryon.zip)
 
 ## What is Neuralyn TRYON?
 
@@ -38,7 +38,7 @@ Before installing the module, you need an active Neuralyn TRYON subscription.
 
 1. **Download** the latest version:
 
-   [![Download](https://img.shields.io/badge/Download-neuralyn__tryon.zip-green?style=flat-square&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.3/neuralyn_tryon.zip)
+   [![Download](https://img.shields.io/badge/Download-neuralyn__tryon.zip-green?style=flat-square&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.4/neuralyn_tryon.zip)
 
 2. In your PrestaShop admin panel, go to **Modules > Module Manager**
 
@@ -90,10 +90,10 @@ This module is proprietary software. Each license is valid for a single PrestaSh
 
 # Neuralyn TRYON - Provador Virtual para PrestaShop
 
-[![Versão](https://img.shields.io/badge/version-1.0.3-blue.svg)](https://github.com/Neuralyn-AI/tryon-prestashop/releases)
+[![Versão](https://img.shields.io/badge/version-1.0.4-blue.svg)](https://github.com/Neuralyn-AI/tryon-prestashop/releases)
 [![PrestaShop](https://img.shields.io/badge/PrestaShop-1.7%2B-pink.svg)](https://www.prestashop.com/)
 
-[![Baixar Última Versão](https://img.shields.io/badge/Baixar-neuralyn__tryon.zip-green?style=for-the-badge&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.3/neuralyn_tryon.zip)
+[![Baixar Última Versão](https://img.shields.io/badge/Baixar-neuralyn__tryon.zip-green?style=for-the-badge&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.4/neuralyn_tryon.zip)
 
 ## O que é o Neuralyn TRYON?
 
@@ -128,7 +128,7 @@ Antes de instalar o módulo, você precisa de uma assinatura ativa do Neuralyn T
 
 1. **Baixe** a versão mais recente:
 
-   [![Baixar](https://img.shields.io/badge/Baixar-neuralyn__tryon.zip-green?style=flat-square&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.3/neuralyn_tryon.zip)
+   [![Baixar](https://img.shields.io/badge/Baixar-neuralyn__tryon.zip-green?style=flat-square&logo=github)](https://github.com/Neuralyn-AI/tryon-prestashop/releases/download/v1.0.4/neuralyn_tryon.zip)
 
 2. No painel admin do seu PrestaShop, acesse **Módulos > Gerenciador de Módulos**
 
