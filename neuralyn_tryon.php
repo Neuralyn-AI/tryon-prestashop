@@ -30,8 +30,6 @@ class NeuralynTryon extends Module
 
     public const CONFIG_WS_ID = 'NEURALYN_TRYON_WS_ID';
     public const CONFIG_LICENSE_KEY = 'NEURALYN_TRYON_LICENSE_KEY';
-    public const CONFIG_CONNECTION_ID = 'NEURALYN_TRYON_CONNECTION_ID';
-    public const CONFIG_CONNECTION_ID_EXPIRE = 'NEURALYN_TRYON_CONNECTION_ID_EXPIRE';
     public const CONFIG_HOOKS_ENABLED = 'NEURALYN_TRYON_HOOKS_ENABLED';
     public const CONFIG_HOOKS_LOCATION = 'NEURALYN_TRYON_HOOKS_LOCATION';
     public const CONFIG_BUTTON_STYLE = 'NEURALYN_TRYON_BTN_STYLE';
@@ -39,8 +37,10 @@ class NeuralynTryon extends Module
     public const CONFIG_BUYER_ORDER_STATUSES = 'NEURALYN_TRYON_BUYER_ORDER_STATUSES';
     public const CONFIG_API_BASE_URL = 'NEURALYN_TRYON_API_BASE_URL';
     public const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
-    public const NEURALYN_CONNECT_WEB_BASE_URL = 'https://www.neuralyn.com.br';
-    public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
+    #public const NEURALYN_CONNECT_WEB_BASE_URL = 'http://127.0.0.1:8222';
+    #public const NEURALYN_CDN_URL = 'http://localhost:8222';
+    public const NEURALYN_CDN_URL = 'https://www.neuralyn.com.br';
+    public const NEURALYN_CONNECT_WEB_BASE_URL = 'https://tryon-cdn.neuralyn.ai';
 
     public const LOCATION_PRODUCT = 'product';
     public const LOCATION_LISTING = 'listing';
@@ -141,7 +141,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.4';
+        $this->version = '1.0.6';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -279,8 +279,7 @@ class NeuralynTryon extends Module
     public function hookDisplayBackOfficeHeader()
     {
         if ($this->context->controller) {
-            $this->context->controller->addCSS($this->_path . 'views/css/admin.css');
-            $this->context->controller->addCSS(self::NEURALYN_CDN_URL . '/styles.min.css');
+            # Load SDK in the admin backend to get the css styles from buttons
         }
     }
 
@@ -766,6 +765,7 @@ class NeuralynTryon extends Module
             'neuralyn_hook_name' => $hookName,
             'neuralyn_button_style' => $buttonStyle,
             'neuralyn_button_float_right' => $this->getButtonFloatRight(),
+            'display_none' => 'display: none'
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/button.tpl');
@@ -849,6 +849,13 @@ class NeuralynTryon extends Module
             }
             $this->saveBuyerOrderStatuses(array_map('intval', $selectedStatuses));
             $output .= $this->displayConfirmation($this->l('Buyer order statuses have been saved.'));
+        }
+
+        // Handle license key form submission
+        if (Tools::isSubmit('submitNeuralynLicenseKey')) {
+            $licenseKey = Tools::getValue('neuralyn_license_key');
+            Configuration::updateValue(self::CONFIG_LICENSE_KEY, pSQL($licenseKey));
+            $output .= $this->displayConfirmation($this->l('License key has been saved.'));
         }
 
         // Handle success message from callback redirect

@@ -17,91 +17,20 @@
  * @copyright © 2025 Neuralyn
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  *}
-<div class="panel">
-    <h3><i class="icon-cogs"></i> {l s='Neuralyn TRYON Integration' mod='neuralyn_tryon'}</h3>
-    <p>{l s='Connect your store to Neuralyn TRYON to enable seamless integration.' mod='neuralyn_tryon'}</p>
-
-    <div id="neuralyn-message" class="alert" style="display:none;"></div>
-
-    {if $is_connected}
-        <div class="alert alert-success">
-            <i class="icon-check"></i> {l s='Your store is connected to Neuralyn TRYON.' mod='neuralyn_tryon'}
-        </div>
-
-        <h4>{l s='License Information' mod='neuralyn_tryon'}</h4>
-        <p>{l s='License Key:' mod='neuralyn_tryon'} <code>{$license_key|escape:'html':'UTF-8'}</code></p>
-
-        <a href="{$manage_url|escape:'html':'UTF-8'}" class="btn btn-default" target="_blank">
-            <i class="icon-external-link"></i> {l s='Manage Subscription' mod='neuralyn_tryon'}
-        </a>
-    {else}
-        <button id="neuralyn-connect-btn" class="btn btn-primary" data-url="{$connect_url|escape:'html':'UTF-8'}" data-secure="{$neuralyn_secure_key|escape:'html':'UTF-8'}">
-            {l s='Connect with Neuralyn' mod='neuralyn_tryon'}
-        </button>
-    {/if}
-
-    <hr />
-    <h4>{l s='Store Information' mod='neuralyn_tryon'}</h4>
-    <ul>
-        <li>{l s='PrestaShop version:' mod='neuralyn_tryon'} <strong>{$ps_version|escape:'html':'UTF-8'}</strong></li>
-        <li>{l s='Module version:' mod='neuralyn_tryon'} <strong>{$module_version|escape:'html':'UTF-8'}</strong></li>
-    </ul>
-</div>
 
 <div class="panel">
-    <h3><i class="icon-paint-brush"></i> {l s='Button Design' mod='neuralyn_tryon'}</h3>
-    <p>{l s='Choose the button style for the TRYON button.' mod='neuralyn_tryon'}</p>
+    <h3><i class="icon-key"></i> {l s='License Key' mod='neuralyn_tryon'}</h3>
+    <p>{l s='Enter your Neuralyn TRYON license key to activate the integration.' mod='neuralyn_tryon'}</p>
 
     <form method="post" action="">
-        <div class="button-design-container">
-            <div class="button-design-select">
-                <label for="button_style">{l s='Button Style' mod='neuralyn_tryon'}</label>
-                <select name="button_style" id="button_style" class="form-control" onchange="updateButtonPreview()">
-                    {foreach from=$button_styles key=style_key item=style_label}
-                    <option value="{$style_key|escape:'html':'UTF-8'}" {if $current_button_style == $style_key}selected="selected"{/if}>
-                        {l s=$style_label mod='neuralyn_tryon'}
-                    </option>
-                    {/foreach}
-                </select>
-
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>{l s='Float Right' mod='neuralyn_tryon'}</label>
-                    <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" name="button_float_right" id="button_float_right_on" value="1"
-                               {if $button_float_right}checked="checked"{/if} onchange="updateButtonPreview()" />
-                        <label for="button_float_right_on">{l s='Yes' mod='neuralyn_tryon'}</label>
-                        <input type="radio" name="button_float_right" id="button_float_right_off" value="0"
-                               {if !$button_float_right}checked="checked"{/if} onchange="updateButtonPreview()" />
-                        <label for="button_float_right_off">{l s='No' mod='neuralyn_tryon'}</label>
-                        <a class="slide-button btn"></a>
-                    </span>
-                </div>
-
-                <div id="custom-style-notice" class="alert alert-info" style="margin-top: 15px; {if $current_button_style != 'custom'}display:none;{/if}">
-                    <i class="icon-info-circle"></i>
-                    {l s='Add CSS to your theme using:' mod='neuralyn_tryon'}
-                    <code>.neuralyn-tryon-app-button</code>
-                </div>
-            </div>
-
-            <div class="button-design-preview">
-                <label>{l s='Preview' mod='neuralyn_tryon'}</label>
-                <div class="preview-container">
-                    <button type="button" id="button-preview" class="neuralyn-tryon-app-button{if $current_button_style != 'custom'} neuralyn-tryon-{$current_button_style|escape:'html':'UTF-8'}-button{/if}{if $current_button_style == 'animated'} is-visible{/if}{if $button_float_right} neuralyn-tryon-app-button-float-right{/if}">
-                        {l s='Prove em você' mod='neuralyn_tryon'}
-                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 95" aria-hidden="true">
-                            <g transform="translate(0,95) scale(0.1,-0.1)" fill="currentColor" stroke="none">
-                                <path d="M408 863 c-46 -192 -94 -255 -225 -296 -43 -14 -98 -28 -121 -32 -55 -9 -46 -17 46 -38 189 -44 256 -115 301 -319 l18 -83 12 60 c31 152 72 236 138 279 21 14 81 37 133 51 52 15 102 29 110 32 8 2 -27 15 -79 28 -171 44 -224 93 -272 250 -46 149 -43 145 -61 68z"/>
-                                <path d="M756 415 c-10 -54 -42 -112 -71 -131 -14 -9 -51 -24 -82 -34 l-58 -18 45 -12 c105 -28 137 -59 164 -161 l14 -54 7 40 c20 99 54 138 153 171 37 13 60 23 51 23 -36 2 -121 33 -145 54 -16 14 -35 49 -49 92 l-22 69 -7 -39z"/>
-                            </g>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+        <div class="form-group">
+            <label for="neuralyn_license_key">{l s='License Key' mod='neuralyn_tryon'}</label>
+            <input type="text" name="neuralyn_license_key" id="neuralyn_license_key" class="form-control" value="{$license_key|escape:'html':'UTF-8'}" placeholder="{l s='Enter your license key' mod='neuralyn_tryon'}" />
+            <p class="help-block">{l s='You can obtain your license key from the Neuralyn TRYON platform.' mod='neuralyn_tryon'} - <a href="https://www.neuralyn.com.br/dashboard" target="_blank">https://www.neuralyn.com.br/dashboard</a></p>
         </div>
 
         <div class="panel-footer">
-            <button type="submit" name="submitNeuralynButtonDesign" class="btn btn-default pull-right">
+            <button type="submit" name="submitNeuralynLicenseKey" class="btn btn-default pull-right">
                 <i class="process-icon-save"></i> {l s='Save' mod='neuralyn_tryon'}
             </button>
         </div>
@@ -194,39 +123,6 @@
 </div>
 
 <style>
-.button-design-container {
-    display: flex;
-    gap: 40px;
-    align-items: flex-start;
-    margin-bottom: 15px;
-}
-.button-design-select {
-    flex: 0 0 300px;
-}
-.button-design-select label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-.button-design-select select {
-    width: 100%;
-}
-.button-design-preview {
-    flex: 1;
-}
-.button-design-preview > label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-.preview-container {
-    padding: 30px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 .order-statuses-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

@@ -26,9 +26,8 @@ window.TRYON_CONFIG = {
     customerUUID: "{$customerUUID|escape:'javascript':'UTF-8'}",
     customerType: "{$customerType|escape:'javascript':'UTF-8'}",
     loginUrl: "{$loginUrl|escape:'javascript':'UTF-8'}",
-    platform: "prestashop"{if $customerId},
-    staticToken: "{$staticToken|escape:'javascript':'UTF-8'}",
-    photos: {$customerPhotos|json_encode}{/if}
+    platform: "prestashop",
+    staticToken: "{$staticToken|escape:'javascript':'UTF-8'}"
 };
 </script>
 {/nocache}
