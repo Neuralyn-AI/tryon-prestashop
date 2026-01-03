@@ -37,10 +37,8 @@ class NeuralynTryon extends Module
     public const CONFIG_BUYER_ORDER_STATUSES = 'NEURALYN_TRYON_BUYER_ORDER_STATUSES';
     public const CONFIG_API_BASE_URL = 'NEURALYN_TRYON_API_BASE_URL';
     public const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
-    #public const NEURALYN_CONNECT_WEB_BASE_URL = 'http://127.0.0.1:8222';
-    #public const NEURALYN_CDN_URL = 'http://localhost:8222';
-    public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
-    public const NEURALYN_CONNECT_WEB_BASE_URL = 'https://www.neuralyn.com.br';
+    public const NEURALYN_CDN_URL = 'http://localhost:8222';
+    #public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
 
     public const LOCATION_PRODUCT = 'product';
     public const LOCATION_LISTING = 'listing';
@@ -256,8 +254,6 @@ class NeuralynTryon extends Module
 
         Configuration::deleteByName(self::CONFIG_WS_ID);
         Configuration::deleteByName(self::CONFIG_LICENSE_KEY);
-        Configuration::deleteByName(self::CONFIG_CONNECTION_ID);
-        Configuration::deleteByName(self::CONFIG_CONNECTION_ID_EXPIRE);
         Configuration::deleteByName(self::CONFIG_HOOKS_ENABLED);
         Configuration::deleteByName(self::CONFIG_HOOKS_LOCATION);
         Configuration::deleteByName(self::CONFIG_BUTTON_STYLE);
@@ -862,15 +858,7 @@ class NeuralynTryon extends Module
             $output .= $this->displayConfirmation($this->l('Your store has been successfully connected to Neuralyn TRYON.'));
         }
 
-        // Handle error message from callback redirect
-        $errorType = Tools::getValue('neuralyn_error');
-        if ('connection_expired' === $errorType) {
-            $output .= $this->displayError($this->l('The connection time has expired. Please start the connection process again.'));
-        }
-
-        $isConnected = $this->isConnected();
         $licenseKey = Configuration::get(self::CONFIG_LICENSE_KEY);
-        $manageUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/tryon/manage/?licenseKey=' . urlencode($licenseKey);
 
         // Prepare hooks configuration data
         $enabledHooks = $this->getEnabledHooks();
@@ -894,13 +882,11 @@ class NeuralynTryon extends Module
         $buyerOrderStatuses = $this->getBuyerOrderStatuses();
 
         $this->context->smarty->assign([
-            'connect_url' => $this->context->link->getModuleLink($this->name, 'connect', [], true),
             'ps_version' => _PS_VERSION_,
             'module_version' => $this->version,
             'neuralyn_secure_key' => $this->getSecureKey(),
-            'is_connected' => $isConnected,
             'license_key' => $licenseKey,
-            'manage_url' => $manageUrl,
+            'manage_url' => 'https://www.neuralyn.com.br/dashboard',
             'hooks_config' => $hooksConfig,
             'location_product' => self::LOCATION_PRODUCT,
             'location_listing' => self::LOCATION_LISTING,
@@ -932,220 +918,6 @@ class NeuralynTryon extends Module
      *
      * @return bool
      */
-    public function isConnected()
-    {
-        $licenseKey = Configuration::get(self::CONFIG_LICENSE_KEY);
-
-        return !empty($licenseKey);
-    }
-
-    /**
-     * Validate a connection ID against stored value and expiration.
-     *
-     * @param string $connectionId
-     *
-     * @return array
-     */
-    public function validateConnectionId($connectionId)
-    {
-        $storedId = Configuration::get(self::CONFIG_CONNECTION_ID);
-        $expireTime = (int) Configuration::get(self::CONFIG_CONNECTION_ID_EXPIRE);
-
-        if ($storedId !== $connectionId) {
-            return ['valid' => false, 'error' => 'invalid_connection_id'];
-        }
-
-        if (time() > $expireTime) {
-            return ['valid' => false, 'error' => 'connection_expired'];
-        }
-
-        return ['valid' => true];
-    }
-
-    /**
-     * Save license key from callback.
-     *
-     * @param string $licenseKey
-     *
-     * @return bool
-     */
-    public function saveKeys($licenseKey)
-    {
-        Configuration::updateValue(self::CONFIG_LICENSE_KEY, $licenseKey);
-
-        // Clear connection_id after successful use
-        Configuration::deleteByName(self::CONFIG_CONNECTION_ID);
-        Configuration::deleteByName(self::CONFIG_CONNECTION_ID_EXPIRE);
-
-        return true;
-    }
-
-    /**
-     * Connect to Neuralyn and return redirect URL.
-     *
-     * @return array
-     */
-    public function connect()
-    {
-        $connectionId = Tools::passwdGen(64);
-        $connectionIdExpire = time() + (15 * 60); // 15 minutes from now
-
-        // Save connection_id and expiration for later validation
-        Configuration::updateValue(self::CONFIG_CONNECTION_ID, $connectionId);
-        Configuration::updateValue(self::CONFIG_CONNECTION_ID_EXPIRE, $connectionIdExpire);
-
-        $domain = Tools::getShopDomainSsl(true);
-        $domain = preg_replace('#^https?://#', '', $domain);
-        $domain = rtrim($domain, '/');
-
-        $redirectUrl = self::NEURALYN_CONNECT_WEB_BASE_URL . '/connect/tryon?' . http_build_query([
-            'connectionId' => $connectionId,
-            'domain' => $domain,
-            'service_token' => 'tryon',
-            'platform' => 'prestashop',
-        ]);
-
-        return ['success' => true, 'redirect_url' => $redirectUrl];
-    }
-
-    /**
-     * Create a WebService key in PrestaShop.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function createWebserviceKey($key)
-    {
-        if (!class_exists('WebserviceKey')) {
-            return false;
-        }
-
-        $wsKey = new WebserviceKey();
-        $wsKey->key = $key;
-        $wsKey->description = 'Neuralyn TRYON Integration';
-        $wsKey->active = true;
-
-        // Use try-catch to handle WebserviceKey creation in FO context
-        try {
-            $addResult = $wsKey->add();
-        } catch (Exception $e) {
-            // If WebserviceKey::add() fails due to missing employee context,
-            // it's likely because we're in FO context. This is expected.
-            $addResult = true; // Assume success since the key object is valid
-
-            // Log the exception for debugging but don't fail the process
-            PrestaShopLogger::addLog(
-                'Neuralyn TRYON: WebserviceKey creation attempted in FO context: ' . $e->getMessage(),
-                2, // Warning level
-                null,
-                'NeuralynTryon'
-            );
-        }
-
-        if (!$addResult) {
-            return false;
-        }
-
-        $permissions = [
-            'customers' => ['GET' => 1],
-            'orders' => ['GET' => 1],
-            'products' => ['GET' => 1],
-            'images' => ['GET' => 1],
-            'image_types' => ['GET' => 1],
-            'languages' => ['GET' => 1],
-            'search' => ['GET' => 1],
-        ];
-
-        if (method_exists('WebserviceKey', 'setPermissionForAccount')) {
-            WebserviceKey::setPermissionForAccount((int) $wsKey->id, $permissions);
-        } else {
-            foreach ($permissions as $resource => $methods) {
-                foreach ($methods as $method => $value) {
-                    Db::getInstance()->insert('webservice_permission', [
-                        'resource' => pSQL($resource),
-                        'method' => pSQL($method),
-                        'id_webservice_account' => (int) $wsKey->id,
-                    ]);
-                }
-            }
-        }
-
-        Configuration::updateValue(self::CONFIG_WS_ID, (int) $wsKey->id);
-
-        return true;
-    }
-
-    /**
-     * @return void
-     */
-    protected function deleteWebserviceKey()
-    {
-        $wsId = (int) Configuration::get(self::CONFIG_WS_ID);
-
-        if ($wsId > 0 && class_exists('WebserviceKey')) {
-            $ws = new WebserviceKey($wsId);
-            if (Validate::isLoadedObject($ws)) {
-                $ws->delete();
-            }
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getWebserviceBaseUrl()
-    {
-        return Tools::getShopDomainSsl(true) . __PS_BASE_URI__ . 'api/';
-    }
-
-    /**
-     * @param string $url
-     *
-     * @return array
-     */
-    public function callExternalApi($url, array $payload)
-    {
-        if (function_exists('curl_init')) {
-            $ch = curl_init($url);
-            curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, \CURLOPT_POST, true);
-            curl_setopt($ch, \CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            curl_setopt($ch, \CURLOPT_POSTFIELDS, json_encode($payload));
-            curl_setopt($ch, \CURLOPT_TIMEOUT, 15);
-
-            $response = curl_exec($ch);
-            $status = curl_getinfo($ch, \CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
-            curl_close($ch);
-        } else {
-            $context = stream_context_create([
-                'http' => [
-                    'method' => 'POST',
-                    'header' => "Content-Type: application/json\r\n",
-                    'content' => json_encode($payload),
-                    'timeout' => 15,
-                ],
-            ]);
-            $response = @file_get_contents($url, false, $context);
-            $status = 200;
-            $error = '';
-
-            if (isset($http_response_header[0])) {
-                if (preg_match('#HTTP/[0-9\\.]+\\s+(\\d+)#', $http_response_header[0], $matches)) {
-                    $status = (int) $matches[1];
-                }
-            }
-        }
-
-        if (false === $response || $status >= 400) {
-            PrestaShopLogger::addLog('Neuralyn TRYON API call failed: ' . $error . ' status:' . $status, 3, null, 'Neuralyn TRYON');
-
-            return ['success' => false, 'status' => $status, 'error' => $error, 'response' => $response];
-        }
-
-        return ['success' => true, 'status' => $status, 'response' => $response];
-    }
 
     private function getCustomerUUID($customerId)
     {
@@ -1195,45 +967,6 @@ class NeuralynTryon extends Module
         $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-    }
-
-    /**
-     * Get customer photos from cache or database.
-     *
-     * @param int $customerId
-     *
-     * @return array Associative array [productId => uuid]
-     */
-    private function getCustomerPhotos($customerId)
-    {
-        $cacheKey = 'neuralyn_tryon_photos_' . (int) $customerId;
-
-        // Try cache first
-        if (Cache::isStored($cacheKey)) {
-            $cached = Cache::retrieve($cacheKey);
-            if (is_array($cached)) {
-                return $cached;
-            }
-        }
-
-        // Get from database
-        $result = Db::getInstance()->getValue(
-            'SELECT neuralyn_tryon_photos
-            FROM ' . _DB_PREFIX_ . 'customer
-            WHERE id_customer = ' . (int) $customerId
-        );
-
-        if (empty($result)) {
-            $photos = [];
-        } else {
-            $decoded = json_decode($result, true);
-            $photos = is_array($decoded) ? $decoded : [];
-        }
-
-        // Store in cache
-        Cache::store($cacheKey, $photos);
-
-        return $photos;
     }
 
     /**
@@ -1307,7 +1040,6 @@ class NeuralynTryon extends Module
         $customerType = $this->getCustomerType($customerId);
         $loginUrl = $this->context->link->getPageLink('authentication');
         $customerUUID = $customerId ? $this->getCustomerUUID($customerId) : '';
-        $customerPhotos = $customerId ? $this->getCustomerPhotos($customerId) : [];
 
         $this->context->smarty->assign([
             'licenseKey' => pSQL($licenseKey),
@@ -1316,7 +1048,6 @@ class NeuralynTryon extends Module
             'customerId' => $customerId,
             'customerType' => $customerType,
             'customerUUID' => $customerUUID,
-            'customerPhotos' => $customerPhotos,
             'loginUrl' => $loginUrl,
             'staticToken' => $customerId ? Tools::getToken(false) : '',
         ]);
