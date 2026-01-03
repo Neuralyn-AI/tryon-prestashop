@@ -39,8 +39,8 @@ class NeuralynTryon extends Module
     public const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
     #public const NEURALYN_CONNECT_WEB_BASE_URL = 'http://127.0.0.1:8222';
     #public const NEURALYN_CDN_URL = 'http://localhost:8222';
-    public const NEURALYN_CDN_URL = 'https://www.neuralyn.com.br';
-    public const NEURALYN_CONNECT_WEB_BASE_URL = 'https://tryon-cdn.neuralyn.ai';
+    public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
+    public const NEURALYN_CONNECT_WEB_BASE_URL = 'https://www.neuralyn.com.br';
 
     public const LOCATION_PRODUCT = 'product';
     public const LOCATION_LISTING = 'listing';
@@ -141,7 +141,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.7';
+        $this->version = '1.0.8';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -788,8 +788,7 @@ class NeuralynTryon extends Module
 
         $this->context->smarty->assign([
             'neuralyn_tryon_domain' => $domain,
-            'neuralyn_tryon_store_id' => $storeId,
-            'neuralyn_front_css_url' => self::NEURALYN_CDN_URL . '/styles.min.css',
+            'neuralyn_tryon_store_id' => $storeId
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/header.tpl');
