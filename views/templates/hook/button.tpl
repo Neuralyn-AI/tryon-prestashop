@@ -18,6 +18,6 @@
  * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
  *}
 <div class="neuralyn-tryon-hook-container">
-    <button class="neuralyn-tryon-app-button{if $neuralyn_button_style != 'custom'} neuralyn-tryon-{$neuralyn_button_style|escape:'html':'UTF-8'}-button{/if}{if $neuralyn_button_float_right} neuralyn-tryon-app-button-float-right{/if}" style="display: none">
+    <button class="neuralyn-tryon-app-button{if $neuralyn_button_float_right} neuralyn-tryon-app-button-float-right{/if}" style="display: none">
     {l s='Experimentar' mod='neuralyn_tryon'} 
 </div>
