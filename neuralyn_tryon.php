@@ -141,7 +141,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.6';
+        $this->version = '1.0.7';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
