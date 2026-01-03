@@ -43,3 +43,6 @@ $_MODULE['<{neuralyn_tryon}prestashop>configure_ee38e4d5dd68c4e440825018d549cb47
 $_MODULE['<{neuralyn_tryon}prestashop>configure_909cea0c97058cfe2e3ea8d675cb08e1'] = 'Naranja';
 $_MODULE['<{neuralyn_tryon}prestashop>configure_b9ba865fec061c9706d2fd7ce49c0cc7'] = 'Morado';
 $_MODULE['<{neuralyn_tryon}prestashop>configure_90589c47f06eb971d548591f23c285af'] = 'Personalizado';
+
+// Button template (button.tpl)
+$_MODULE['<{neuralyn_tryon}prestashop>button_97f343c1838e5236eaad1145907c6cc7'] = 'Probármelo';

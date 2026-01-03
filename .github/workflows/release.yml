@@ -49,7 +49,6 @@ jobs:
         run: |
           mkdir -p neuralyn_tryon
           # Copy all module files
-          cp -r controllers neuralyn_tryon/
           cp -r views neuralyn_tryon/
           cp -r translations neuralyn_tryon/
           cp neuralyn_tryon.php neuralyn_tryon/
