@@ -37,6 +37,6 @@
               l-20 31 -6 -24z"></path>
               </g>
             </svg>
-            {l s='Experimentar' mod='neuralyn_tryon'} 
+            {l s='Try-On' mod='neuralyn_tryon'} 
           </button>
 </div>

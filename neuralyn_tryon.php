@@ -28,53 +28,15 @@ class NeuralynTryon extends Module
 {
     public $cached = false;
 
-    public const CONFIG_WS_ID = 'NEURALYN_TRYON_WS_ID';
     public const CONFIG_LICENSE_KEY = 'NEURALYN_TRYON_LICENSE_KEY';
     public const CONFIG_HOOKS_ENABLED = 'NEURALYN_TRYON_HOOKS_ENABLED';
     public const CONFIG_HOOKS_LOCATION = 'NEURALYN_TRYON_HOOKS_LOCATION';
-    public const CONFIG_BUTTON_STYLE = 'NEURALYN_TRYON_BTN_STYLE';
-    public const CONFIG_BUTTON_FLOAT_RIGHT = 'NEURALYN_TRYON_BTN_FLOAT_RIGHT';
     public const CONFIG_BUYER_ORDER_STATUSES = 'NEURALYN_TRYON_BUYER_ORDER_STATUSES';
-    public const CONFIG_API_BASE_URL = 'NEURALYN_TRYON_API_BASE_URL';
-    public const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
     public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
 
     public const LOCATION_PRODUCT = 'product';
     public const LOCATION_LISTING = 'listing';
     public const LOCATION_BOTH = 'both';
-
-    public const STYLE_ANIMATED = 'animated';
-    public const STYLE_BLACK = 'black';
-    public const STYLE_PINK = 'pink';
-    public const STYLE_DARK_BLUE = 'dark-blue';
-    public const STYLE_LIGHT_BLUE = 'light-blue';
-    public const STYLE_GREEN = 'green';
-    public const STYLE_WHITE = 'white';
-    public const STYLE_GRAY = 'gray';
-    public const STYLE_RED = 'red';
-    public const STYLE_ORANGE = 'orange';
-    public const STYLE_PURPLE = 'purple';
-    public const STYLE_CUSTOM = 'custom';
-
-    /**
-     * Available button styles with labels.
-     *
-     * @var array<string, string>
-     */
-    public static $buttonStyles = [
-        'animated' => 'Animated',
-        'black' => 'Black',
-        'pink' => 'Pink',
-        'dark-blue' => 'Dark blue',
-        'light-blue' => 'Light blue',
-        'green' => 'Green',
-        'white' => 'White',
-        'gray' => 'Gray',
-        'red' => 'Red',
-        'orange' => 'Orange',
-        'purple' => 'Purple',
-        'custom' => 'Custom',
-    ];
 
     /**
      * Available hooks for widget placement with descriptions.
@@ -82,15 +44,15 @@ class NeuralynTryon extends Module
      * @var array<string, string>
      */
     public static $availableHooks = [
-        'displayProductPriceBlock_after_price' => 'Renderizado imediatamente após o preço final.',
-        'displayAfterProductThumbs' => 'Renderizado logo depois da lista de thumbnails da galeria.',
-        'displayReassurance' => 'Aparece logo abaixo da breadcrumb, antes da área principal do produto.',
-        'displayProductAdditionalInfo' => 'Inserido logo abaixo da área de botões (informações extras).',
-        'displayProductExtraContent' => 'Adiciona novas abas (tabs) ou conteúdo nas abas do produto.',
-        'displayProductPriceBlock_old_price' => 'Mostrado no local do preço antigo riscado (para promoções).',
-        'displayProductPriceBlock_before_price' => 'Mostrado imediatamente antes de qualquer preço aparecer.',
-        'displayProductPriceBlock_unit_price' => 'Exibido onde aparece o preço por unidade (ex: por litro).',
-        'displayProductPriceBlock_weight' => 'Exibido onde aparece o preço baseado no peso.',
+        'displayProductPriceBlock_after_price' => 'Rendered immediately after the final price.',
+        'displayAfterProductThumbs' => 'Rendered right after the gallery thumbnails list.',
+        'displayReassurance' => 'Appears right below the breadcrumb, before the main product area.',
+        'displayProductAdditionalInfo' => 'Inserted just below the buttons area (additional information).',
+        'displayProductExtraContent' => 'Adds new tabs or content within the product tabs.',
+        'displayProductPriceBlock_old_price' => 'Displayed in the crossed-out old price location (for promotions).',
+        'displayProductPriceBlock_before_price' => 'Displayed immediately before any price appears.',
+        'displayProductPriceBlock_unit_price' => 'Displayed where the unit price appears (e.g., per liter).',
+        'displayProductPriceBlock_weight' => 'Displayed where the weight-based price appears.',
     ];
 
     /**
@@ -138,7 +100,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -149,8 +111,8 @@ class NeuralynTryon extends Module
         // Initialize secure_key for AJAX validation
         $this->secure_key = md5($this->name . _COOKIE_KEY_);
 
-        $this->displayName = $this->l('Neuralyn TRYON Integration');
-        $this->description = $this->l('Connect your store to Neuralyn TRYON SaaS platform and enable the Neuralyn widget.');
+        $this->displayName = $this->l('TRYON Virtual Fitting Room');
+        $this->description = $this->l('Connect your store to Neuralyn TRYON Virtual Fitting Room platform and enable the Neuralyn widget.');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall Neuralyn TRYON and revoke its access?');
     }
 
@@ -215,10 +177,6 @@ class NeuralynTryon extends Module
         }
         Configuration::updateValue(self::CONFIG_HOOKS_LOCATION, json_encode($defaultLocations));
 
-        // Set default button style
-        Configuration::updateValue(self::CONFIG_BUTTON_STYLE, self::STYLE_ANIMATED);
-        Configuration::updateValue(self::CONFIG_BUTTON_FLOAT_RIGHT, '0');
-
         // Set default buyer order statuses (paid, shipped, delivered)
         $defaultBuyerStatuses = $this->getDefaultBuyerStatuses();
         Configuration::updateValue(self::CONFIG_BUYER_ORDER_STATUSES, json_encode($defaultBuyerStatuses));
@@ -251,61 +209,10 @@ class NeuralynTryon extends Module
     {
         $this->deleteWebserviceKey();
 
-        Configuration::deleteByName(self::CONFIG_WS_ID);
         Configuration::deleteByName(self::CONFIG_LICENSE_KEY);
         Configuration::deleteByName(self::CONFIG_HOOKS_ENABLED);
         Configuration::deleteByName(self::CONFIG_HOOKS_LOCATION);
-        Configuration::deleteByName(self::CONFIG_BUTTON_STYLE);
-        Configuration::deleteByName(self::CONFIG_BUTTON_FLOAT_RIGHT);
         Configuration::deleteByName(self::CONFIG_BUYER_ORDER_STATUSES);
-    }
-
-    /**
-     * @return string|void
-     */
-    public function hookBackOfficeHeader()
-    {
-        return $this->hookDisplayBackOfficeHeader();
-    }
-
-    /**
-     * @return string|void
-     */
-    public function hookDisplayBackOfficeHeader()
-    {
-        if ($this->context->controller) {
-            # Load SDK in the admin backend to get the css styles from buttons
-        }
-    }
-
-    /**
-     * @param array $params
-     *
-     * @return string
-     */
-    public function hookHeader($params)
-    {
-        return $this->renderWidget();
-    }
-
-    /**
-     * @param array $params
-     *
-     * @return string
-     */
-    public function hookDisplayHeader($params)
-    {
-        return $this->renderWidget();
-    }
-
-    /**
-     * @param array $params
-     *
-     * @return string
-     */
-    public function hookDisplayTop($params)
-    {
-        return $this->renderWidget();
     }
 
     /**
@@ -440,7 +347,7 @@ class NeuralynTryon extends Module
             return [];
         }
 
-        $content = $this->display(__FILE__, 'views/templates/hook/displayProductExtraContent.tpl');
+        $content = $this->display(__FILE__, 'views/templates/hook/button.tpl');
 
         // PrestaShop 1.7+ expects array of PrestaShop\PrestaShop\Core\Product\ProductExtraContent objects
         if (class_exists('PrestaShop\\PrestaShop\\Core\\Product\\ProductExtraContent')) {
@@ -559,56 +466,6 @@ class NeuralynTryon extends Module
     public function saveHookLocations(array $locations)
     {
         return Configuration::updateValue(self::CONFIG_HOOKS_LOCATION, json_encode($locations));
-    }
-
-    /**
-     * Get button style configuration.
-     *
-     * @return string
-     */
-    public function getButtonStyle()
-    {
-        $style = Configuration::get(self::CONFIG_BUTTON_STYLE);
-
-        return !empty($style) && isset(self::$buttonStyles[$style]) ? $style : self::STYLE_ANIMATED;
-    }
-
-    /**
-     * Save button style configuration.
-     *
-     * @param string $style
-     *
-     * @return bool
-     */
-    public function saveButtonStyle($style)
-    {
-        if (!isset(self::$buttonStyles[$style])) {
-            $style = self::STYLE_ANIMATED;
-        }
-
-        return Configuration::updateValue(self::CONFIG_BUTTON_STYLE, $style);
-    }
-
-    /**
-     * Get button float right configuration.
-     *
-     * @return bool
-     */
-    public function getButtonFloatRight()
-    {
-        return (bool) Configuration::get(self::CONFIG_BUTTON_FLOAT_RIGHT);
-    }
-
-    /**
-     * Save button float right configuration.
-     *
-     * @param bool $enabled
-     *
-     * @return bool
-     */
-    public function saveButtonFloatRight($enabled)
-    {
-        return Configuration::updateValue(self::CONFIG_BUTTON_FLOAT_RIGHT, $enabled ? '1' : '0');
     }
 
     /**
@@ -754,39 +611,12 @@ class NeuralynTryon extends Module
             return '';
         }
 
-        $buttonStyle = $this->getButtonStyle();
-
         $this->context->smarty->assign([
             'neuralyn_hook_name' => $hookName,
-            'neuralyn_button_style' => $buttonStyle,
-            'neuralyn_button_float_right' => $this->getButtonFloatRight(),
             'display_none' => 'display: none'
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/button.tpl');
-    }
-
-    /**
-     * @return string
-     */
-    protected function renderWidget()
-    {
-        static $rendered = false;
-
-        if ($rendered) {
-            return '';
-        }
-        $rendered = true;
-
-        $domain = Tools::getShopDomainSsl(true);
-        $storeId = (int) $this->context->shop->id;
-
-        $this->context->smarty->assign([
-            'neuralyn_tryon_domain' => $domain,
-            'neuralyn_tryon_store_id' => $storeId
-        ]);
-
-        return $this->display(__FILE__, 'views/templates/hook/header.tpl');
     }
 
     /**
@@ -824,15 +654,6 @@ class NeuralynTryon extends Module
             $this->saveHookLocations($hookLocations);
 
             $output .= $this->displayConfirmation($this->l('Hook settings have been saved.'));
-        }
-
-        // Handle button design form submission
-        if (Tools::isSubmit('submitNeuralynButtonDesign')) {
-            $buttonStyle = Tools::getValue('button_style', self::STYLE_ANIMATED);
-            $this->saveButtonStyle($buttonStyle);
-            $floatRight = '1' === Tools::getValue('button_float_right');
-            $this->saveButtonFloatRight($floatRight);
-            $output .= $this->displayConfirmation($this->l('Button design settings have been saved.'));
         }
 
         // Handle buyer order statuses form submission
@@ -877,9 +698,6 @@ class NeuralynTryon extends Module
             ];
         }
 
-        // Get button style config
-        $currentButtonStyle = $this->getButtonStyle();
-
         // Get order states for buyer statuses config
         $orderStates = OrderState::getOrderStates($this->context->language->id);
         $buyerOrderStatuses = $this->getBuyerOrderStatuses();
@@ -894,9 +712,6 @@ class NeuralynTryon extends Module
             'location_product' => self::LOCATION_PRODUCT,
             'location_listing' => self::LOCATION_LISTING,
             'location_both' => self::LOCATION_BOTH,
-            'button_styles' => self::$buttonStyles,
-            'current_button_style' => $currentButtonStyle,
-            'button_float_right' => $this->getButtonFloatRight(),
             'order_states' => $orderStates,
             'buyer_order_statuses' => $buyerOrderStatuses,
         ]);

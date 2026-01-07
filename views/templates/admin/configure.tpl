@@ -150,38 +150,3 @@
 }
 </style>
 
-<script type="text/javascript">
-function updateButtonPreview() {
-    var select = document.getElementById('button_style');
-    var preview = document.getElementById('button-preview');
-    var notice = document.getElementById('custom-style-notice');
-    var floatRightOn = document.getElementById('button_float_right_on');
-    var selectedStyle = select.value;
-
-    // Removes all style classes
-    var styles = ['animated', 'black', 'pink', 'dark-blue', 'light-blue', 'green', 'white', 'gray', 'red', 'orange', 'purple'];
-    styles.forEach(function(style) {
-        preview.classList.remove('neuralyn-tryon-' + style + '-button');
-    });
-    preview.classList.remove('is-visible');
-
-    // Add class to the selected style (except custom)
-    if (selectedStyle !== 'custom') {
-        preview.classList.add('neuralyn-tryon-' + selectedStyle + '-button');
-        // Add is-visible for the animated button only
-        if (selectedStyle === 'animated') {
-            preview.classList.add('is-visible');
-        }
-    }
-
-    // Float right
-    if (floatRightOn && floatRightOn.checked) {
-        preview.classList.add('neuralyn-tryon-app-button-float-right');
-    } else {
-        preview.classList.remove('neuralyn-tryon-app-button-float-right');
-    }
-
-    // show/hide message regarding custom styles
-    notice.style.display = selectedStyle === 'custom' ? 'block' : 'none';
-}
-</script>
