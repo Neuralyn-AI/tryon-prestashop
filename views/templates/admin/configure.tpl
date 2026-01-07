@@ -25,7 +25,7 @@
     <form method="post" action="">
         <div class="form-group">
             <label for="neuralyn_license_key">{l s='License Key' mod='neuralyn_tryon'}</label>
-            <input type="text" name="neuralyn_license_key" id="neuralyn_license_key" class="form-control" value="{$license_key|escape:'html':'UTF-8'}" placeholder="{l s='Enter your license key' mod='neuralyn_tryon'}" />
+            <input type="text" name="neuralyn_license_key" id="neuralyn_license_key" class="form-control" value="{$license_key|escape:'html':'UTF-8'}" placeholder="{l s='Enter your license key' mod='neuralyn_tryon'}" maxlength="36" pattern="[^\s]+" title="{l s='Spaces are not allowed' mod='neuralyn_tryon'}" />
             <p class="help-block">{l s='You can obtain your license key from the Neuralyn TRYON platform.' mod='neuralyn_tryon'} - <a href="https://www.neuralyn.com.br/dashboard" target="_blank">https://www.neuralyn.com.br/dashboard</a></p>
         </div>
 

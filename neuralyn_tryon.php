@@ -37,8 +37,7 @@ class NeuralynTryon extends Module
     public const CONFIG_BUYER_ORDER_STATUSES = 'NEURALYN_TRYON_BUYER_ORDER_STATUSES';
     public const CONFIG_API_BASE_URL = 'NEURALYN_TRYON_API_BASE_URL';
     public const CONFIG_WEB_BASE_URL = 'NEURALYN_TRYON_WEB_URL';
-    public const NEURALYN_CDN_URL = 'http://localhost:8222';
-    #public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
+    public const NEURALYN_CDN_URL = 'https://tryon-cdn.neuralyn.ai';
 
     public const LOCATION_PRODUCT = 'product';
     public const LOCATION_LISTING = 'listing';
@@ -139,7 +138,7 @@ class NeuralynTryon extends Module
     {
         $this->name = 'neuralyn_tryon';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.1';
+        $this->version = '1.1.2';
         $this->author = 'Neuralyn';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -849,6 +848,10 @@ class NeuralynTryon extends Module
         // Handle license key form submission
         if (Tools::isSubmit('submitNeuralynLicenseKey')) {
             $licenseKey = Tools::getValue('neuralyn_license_key');
+            // Remove all whitespace
+            $licenseKey = preg_replace('/\s+/', '', $licenseKey);
+            // Limit to 36 characters
+            $licenseKey = Tools::substr($licenseKey, 0, 36);
             Configuration::updateValue(self::CONFIG_LICENSE_KEY, pSQL($licenseKey));
             $output .= $this->displayConfirmation($this->l('License key has been saved.'));
         }
