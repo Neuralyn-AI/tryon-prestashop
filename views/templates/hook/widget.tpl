@@ -32,7 +32,7 @@ window.TRYON_CONFIG = {
 <script>
 (function loadTryonSDK() {
     var s = document.createElement("script");
-    s.src = "{$cdnUrl}/sdk.min.js";
+    s.src = "{$cdnUrl}/tryon.js";
     s.async = true;
     document.head.appendChild(s);
 })();
