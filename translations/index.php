@@ -14,9 +14,9 @@
  *
  * All intellectual property rights remain with Neuralyn.
  *
- * @author    Neuralyn <support@neuralyn.com.br>
+ * @author    Neuralyn <support@neuralyn.ai>
  * @copyright © 2025 Neuralyn
- * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
+ * @license   https://neuralyn.ai/files/prestashop/license.txt Commercial license.
  */
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');

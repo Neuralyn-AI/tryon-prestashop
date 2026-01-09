@@ -15,7 +15,7 @@ This PrestaShop module integrates the Neuralyn TRYON widget into your store, ena
 
 Experience the virtual try-on feature on our demo store:
 
-**[https://demo-prestashop.neuralyn.com.br/](https://demo-prestashop.neuralyn.com.br/)**
+**[https://demo-prestashop.neuralyn.ai/](https://demo-prestashop.neuralyn.ai/)**
 
 Simply navigate to any clothing product page and click the "Try it on" button.
 
@@ -31,8 +31,8 @@ Simply navigate to any clothing product page and click the "Try it on" button.
 
 Before installing the module, you need an active Neuralyn TRYON subscription.
 
-- **See all features:** [https://www.neuralyn.com.br/en/products/tryon](https://www.neuralyn.com.br/en/products/tryon)
-- **View pricing plans:** [https://www.neuralyn.com.br/en/pricing/tryon](https://www.neuralyn.com.br/en/pricing/tryon)
+- **See all features:** [https://neuralyn.ai/en/products/tryon](https://neuralyn.ai/en/products/tryon)
+- **View pricing plans:** [https://neuralyn.ai/en/pricing/tryon](https://neuralyn.ai/en/pricing/tryon)
 
 ### 2. Download & Install the Module
 
@@ -60,7 +60,7 @@ Before installing the module, you need an active Neuralyn TRYON subscription.
 
 ### 4. Get Your License Key
 
-1. Log in to your Neuralyn dashboard: **[https://www.neuralyn.com.br/dashboard](https://www.neuralyn.com.br/dashboard)**
+1. Log in to your Neuralyn dashboard: **[https://neuralyn.ai/dashboard](https://neuralyn.ai/dashboard)**
 
 2. Navigate to your TRYON subscription
 
@@ -70,7 +70,7 @@ Before installing the module, you need an active Neuralyn TRYON subscription.
 
 Manage your subscription, view analytics, and configure settings through your Neuralyn dashboard:
 
-**[https://www.neuralyn.com.br/dashboard](https://www.neuralyn.com.br/dashboard)**
+**[https://neuralyn.ai/dashboard](https://neuralyn.ai/dashboard)**
 
 ## Features
 
@@ -85,14 +85,14 @@ The Neuralyn TRYON platform offers:
 - Multi-language support
 - And much more...
 
-**See the complete feature list:** [https://www.neuralyn.com.br/en/products/tryon](https://www.neuralyn.com.br/en/products/tryon)
+**See the complete feature list:** [https://neuralyn.ai/en/products/tryon](https://neuralyn.ai/en/products/tryon)
 
 ## Support
 
 For support and inquiries:
 
-- **Email:** support@neuralyn.com.br
-- **Website:** [https://www.neuralyn.com.br](https://www.neuralyn.com.br)
+- **Email:** support@neuralyn.ai
+- **Website:** [https://neuralyn.ai](https://neuralyn.ai)
 
 ## License
 
@@ -117,7 +117,7 @@ Este modulo PrestaShop integra o widget Neuralyn TRYON a sua loja, habilitando a
 
 Experimente o recurso de prova virtual em nossa loja demo:
 
-**[https://demo-prestashop.neuralyn.com.br/](https://demo-prestashop.neuralyn.com.br/)**
+**[https://demo-prestashop.neuralyn.ai/](https://demo-prestashop.neuralyn.ai/)**
 
 Basta navegar ate qualquer pagina de produto de roupa e clicar no botao "Prove em voce".
 
@@ -133,8 +133,8 @@ Basta navegar ate qualquer pagina de produto de roupa e clicar no botao "Prove e
 
 Antes de instalar o modulo, voce precisa de uma assinatura ativa do Neuralyn TRYON.
 
-- **Veja todas as funcionalidades:** [https://www.neuralyn.com.br/pt-BR/products/tryon](https://www.neuralyn.com.br/pt/products/tryon)
-- **Veja os planos e precos:** [https://www.neuralyn.com.br/pt-BR/pricing/tryon](https://www.neuralyn.com.br/pt-BR/pricing/tryon)
+- **Veja todas as funcionalidades:** [https://neuralyn.ai/pt-BR/products/tryon](https://neuralyn.ai/pt/products/tryon)
+- **Veja os planos e precos:** [https://neuralyn.ai/pt-BR/pricing/tryon](https://neuralyn.ai/pt-BR/pricing/tryon)
 
 ### 2. Baixe e Instale o Modulo
 
@@ -162,7 +162,7 @@ Antes de instalar o modulo, voce precisa de uma assinatura ativa do Neuralyn TRY
 
 ### 4. Obtenha sua Chave de Licenca
 
-1. Faca login no seu painel Neuralyn: **[https://www.neuralyn.com.br/dashboard](https://www.neuralyn.com.br/dashboard)**
+1. Faca login no seu painel Neuralyn: **[https://neuralyn.ai/dashboard](https://neuralyn.ai/dashboard)**
 
 2. Navegue ate sua assinatura TRYON
 
@@ -172,7 +172,7 @@ Antes de instalar o modulo, voce precisa de uma assinatura ativa do Neuralyn TRY
 
 Gerencie sua assinatura, veja analises e configure opcoes atraves do seu painel Neuralyn:
 
-**[https://www.neuralyn.com.br/dashboard](https://www.neuralyn.com.br/dashboard)**
+**[https://neuralyn.ai/dashboard](https://neuralyn.ai/dashboard)**
 
 ## Funcionalidades
 
@@ -187,14 +187,14 @@ A plataforma Neuralyn TRYON oferece:
 - Suporte multi-idioma
 - E muito mais...
 
-**Veja a lista completa de funcionalidades:** [https://www.neuralyn.com.br/pt-BR/products/tryon](https://www.neuralyn.com.br/pt-BR/products/tryon)
+**Veja a lista completa de funcionalidades:** [https://neuralyn.ai/pt-BR/products/tryon](https://neuralyn.ai/pt-BR/products/tryon)
 
 ## Suporte
 
 Para suporte e duvidas:
 
-- **Email:** support@neuralyn.com.br
-- **Website:** [https://www.neuralyn.com.br](https://www.neuralyn.com.br)
+- **Email:** support@neuralyn.ai
+- **Website:** [https://neuralyn.ai](https://neuralyn.ai)
 
 ## Licenca
 

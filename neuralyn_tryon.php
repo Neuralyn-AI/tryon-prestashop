@@ -14,9 +14,9 @@
  *
  * All intellectual property rights remain with Neuralyn.
  *
- * @author    Neuralyn <support@neuralyn.com.br>
+ * @author    Neuralyn <support@neuralyn.ai>
  * @copyright © 2025 Neuralyn
- * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
+ * @license   https://neuralyn.ai/files/prestashop/license.txt Commercial license.
  */
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -707,7 +707,7 @@ class NeuralynTryon extends Module
             'module_version' => $this->version,
             'neuralyn_secure_key' => $this->getSecureKey(),
             'license_key' => $licenseKey,
-            'manage_url' => 'https://www.neuralyn.com.br/dashboard',
+            'manage_url' => 'https://neuralyn.ai/dashboard',
             'hooks_config' => $hooksConfig,
             'location_product' => self::LOCATION_PRODUCT,
             'location_listing' => self::LOCATION_LISTING,

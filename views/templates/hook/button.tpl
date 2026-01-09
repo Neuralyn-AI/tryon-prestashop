@@ -13,9 +13,9 @@
  *
  * All intellectual property rights remain with Neuralyn.
  *
- * @author    Neuralyn <support@neuralyn.com.br>
+ * @author    Neuralyn <support@neuralyn.ai>
  * @copyright © 2025 Neuralyn
- * @license   https://www.neuralyn.com.br/files/prestashop/license.txt Commercial license.
+ * @license   https://neuralyn.ai/files/prestashop/license.txt Commercial license.
  *}
 <div class="neuralyn-tryon-hook-container">
     <button

@@ -40,5 +40,5 @@ Upon termination, you must remove the Module and all copies from your system.
 
 7. CONTACT
 Neuralyn  
-https://www.neuralyn.com.br  
-support@neuralyn.com.br
+https://neuralyn.ai  
+support@neuralyn.ai
